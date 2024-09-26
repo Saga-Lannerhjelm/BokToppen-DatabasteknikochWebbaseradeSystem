@@ -1,0 +1,48 @@
+@model BokToppen.Models.BookModel
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">@Model.Title</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Redigera bokinlägg</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-center mt-5">
+  <div class="card" style="width: 50vw;">
+    <div class="card-body">
+      <h5 class="card-title">Redigera</h5>
+
+      <form method="post" asp-action="Edit" class="mt-2">
+        <div class="mb-3">
+          <label asp-for="Title" class="form-label">Titel</label>
+          <input asp-for="Title" class="form-control" value="@Model.Title">
+          @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+        </div>
+        <div class="mb-3">
+          <label asp-for="ISBN" class="form-label">ISBN</label>
+          <input asp-for="ISBN" class="form-control" value="@Model.ISBN">
+          @Html.ValidationMessageFor(m => m.ISBN, "", new { @class = "text-danger" })
+        </div>
+        <div class="mb-3">
+          <label asp-for="Description" class="form-label">Beskrivning</label>
+          <input asp-for="Description" class="form-control" value="@Model.Description">
+          @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+        </div>
+        <div class="mb-3">
+          <label asp-for="Category" class="form-label">Kategori</label>
+          <select asp-for="Category" class="form-select" aria-label="Default select example">
+            @{
+              foreach (var category in ViewData["category"] as List<string>)
+              {
+                <option value="@category" selected="@category == @Model.Category">@category</option>
+              }
+            }
+          </select>
+          <input asp-for="Id" type="hidden">
+        </div>
+        <button type="submit" class="btn btn-primary">Spara ändringar</button>
+      </form>
+
+    </div>
+  </div>
+</div> 

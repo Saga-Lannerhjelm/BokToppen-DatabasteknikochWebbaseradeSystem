@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    var userId = Context.Session.GetString("UserId");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BokToppen</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BokToppen.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <header>
+        @* Navbar taken from bootstrap https://getbootstrap.com/docs/5.0/components/navbar/ *@
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" asp-area="" asp-controller="Books" asp-action="Index">BokToppen</a>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Böcker</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Create">Skapa Bokinlägg</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="CreateUser">Skapa Användare</a>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="GetUsers">Alla Användare</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex px-2">
+                        @if (userId != null)
+                        {
+                            <form method="post" asp-controller="Login" asp-action="LougOut">
+                                <button type="submit" class="nav-link text-light btn btn-dark pb-1 pt-1">Logga Ut</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="nav-link text-light btn btn-dark pb-1 pt-1" asp-area="" asp-controller="Login" asp-action="Index">Logga In</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted justify-content-center d-flex position-absolute bottom-0 w-100" style="line-height: 60px;">
+        <div class="container">
+            &copy; 2024 - Boktoppen
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

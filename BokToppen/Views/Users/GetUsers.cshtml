@@ -1,0 +1,17 @@
+@model IEnumerable<BokToppen.Models.UserModel>
+@{
+    ViewData["Title"] = "Användare";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <p>@ViewBag.error</p>
+</div>
+
+@foreach (var item in Model)
+{
+    <p>@item.Username</p>
+    <p>@item.Email</p>
+    <br/>
+}

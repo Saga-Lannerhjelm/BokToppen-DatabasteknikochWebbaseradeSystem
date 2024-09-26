@@ -1,0 +1,49 @@
+@model BokToppen.Models.ReviewModel
+@{
+    ViewData["Title"] = "Skapa omdömme";
+    var ratings = (List<int>)ViewData["ratings"];
+}
+
+<p>@ViewBag.error</p>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Details" asp-route-id="@ViewBag.BookId">@ViewBag.BookTitle</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Skapa omdöme</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+  <div class="card" style="width: 50vw;">
+    <div class="card-body">
+      <h5 class="card-title">Skapa ett omdöme till <em>@ViewBag.BookTitle</em> </h5>
+
+      <form method="post" asp-controller="Reviews" asp-action="Create">
+        <input type="hidden" asp-for="BookId" value="@ViewBag.BookId">
+        <input type="hidden" name="bookTitle" value="@ViewBag.BookTitle">
+        <div class="mb-3">
+          <label class="form-label">Betyg</label>
+          <div class="d-flex justify-content-start">
+            @{
+              foreach (int rating in ratings)
+              {
+                <div class="mx-2">
+                  <label asp-for="Points" class="form-label">@rating:</label>
+                  <input asp-for="Points" name="points" type="radio" class="form-check-input" value="@rating">
+                </div>
+              }
+            }
+          </div>
+          @Html.ValidationMessageFor(m => m.Points, "", new { @class = "text-danger" })
+        </div>
+        <div class="mb-3">
+          <label asp-for="Comment" class="form-label">Kommentar</label>
+          <textarea asp-for="Comment" class="form-control" placeholder="Skriv en kommentar"></textarea>
+          @Html.ValidationMessageFor(m => m.Comment, "", new { @class = "text-danger" })
+        </div>
+        <input type="submit" class="btn btn-primary" value="Publicera kommentar"/>
+      </form>
+      
+    </div>
+  </div>
+</div>
