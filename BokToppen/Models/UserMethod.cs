@@ -242,6 +242,7 @@ namespace BokToppen.Models
                 {
                     UserModel user = new UserModel()
                     { 
+                        Id = Convert.ToInt32(reader["Us_Id"]),
                         Username = reader["Us_Username"].ToString(), 
                         Email = reader["Us_Email"].ToString()
                     };
@@ -255,6 +256,45 @@ namespace BokToppen.Models
             {
                 errormsg = e.Message;
                 return null;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
+
+        public int DeleteUser(int Id, out string errormsg)
+        {
+
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "DELETE FROM Tbl_User WHERE Us_Id = @userId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = Id;
+
+            try
+            {
+                dbConnection.Open();
+                int affectedRows = 0;
+
+                // ExecuteNonQuery returns the number of rows affected
+                affectedRows = dbCommand.ExecuteNonQuery();
+
+                if (affectedRows == 1)
+                {
+                    errormsg = "";
+                }
+                else
+                {
+                    errormsg = "Gick inte att ta bort användaren";
+                }
+                return affectedRows;
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return 0;
             }
             finally
             {

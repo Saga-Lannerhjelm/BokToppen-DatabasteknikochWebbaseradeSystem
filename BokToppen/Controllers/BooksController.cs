@@ -15,11 +15,20 @@ namespace BokToppen.Controllers
         UserMethod um = new UserMethod();
         List<string> categoryList = new List<string>{ "Romantik", "Fantasi", "Science fiction", "Dystopisk", "Action & Äventyr", "Deckare", "Fakta", "Barnbok", "Ungdomsbok", "Roman", "Novell", "Biografi", "Poesi", };
 
-        public IActionResult Index()
+        public IActionResult Index(string q)
         {
             var books = new List<BookModel>();
             var bm = new BookMethod();
-            books = bm.GetBooks(out string error);
+            string error = "";
+            if (q == null)
+            {
+                books = bm.GetBooks("", out error);
+            }
+            else
+            {
+                books = bm.GetBooks(q, out error);
+            }
+
 
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
             ViewBag.error = error;
@@ -29,23 +38,34 @@ namespace BokToppen.Controllers
 
         public IActionResult Details(int id)
         {
+            // Kollar om boken med idt finns
+            BookModel book = bm.GetBookById(id, out string bookError);
 
-            string bookError = "";
             string reviewError = "";
             string userError = "";
-                
-            var BookReviewsViewModel = new BookReviewsViewModel
+
+            if (book != null)
             {
-                Book = bm.GetBookById(id, out bookError),
-                Reviews = rm.GetReviewsByBook(id, out reviewError)
-            };
+                var BookReviewsViewModel = new BookReviewsViewModel
+                {
+                    Book = bm.GetBookById(id, out bookError),
+                    Reviews = rm.GetReviewsByBook(id, out reviewError)
+                };
 
-            // Send username to view based on user id
-            ViewBag.user = BookReviewsViewModel.Reviews.Count() > 0 ? um.GetUserName(BookReviewsViewModel.Book.User, out userError) : "";
+                // Send username to view based on user id
+                ViewBag.user = um.GetUserName(BookReviewsViewModel.Book.User, out userError);
 
-            ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
-            ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
-            return View(BookReviewsViewModel);
+                ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
+                ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
+                return View(BookReviewsViewModel);
+            }
+            else 
+            {
+                TempData["unsuccessful"] = "Bokinlägget du försökte nå finns inte. " + bookError;
+                return RedirectToAction("index");
+            }
+                
+           
         }
 
         [HttpGet]
@@ -66,14 +86,6 @@ namespace BokToppen.Controllers
             try
             {
                 book.User = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
-
-
-                // if (notUniqueBook != null)
-                // {
-                //     // Lägger till valideringserror
-                //     ModelState.AddModelError(nameof(book.Title),
-                //     "Denna bok finns redan uppladdad. Gå dit ifall du vill lägga till en recension av boken.");
-                // }
 
                 int antal = 0;
                 string error = "";
@@ -111,16 +123,16 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            BookModel? book = GetBookById(id);
+            // Kollar om boken med idt finns
+            BookModel book = bm.GetBookById(id, out string bookError);
 
             if (book == null)
             {
-                TempData["unsuccessful"] = "Bokinlägget kunde inte hittas";
+                TempData["unsuccessful"] = "Bokinlägget som du ville ändra kunde inte hittas";
                 return RedirectToAction("Index");
             }
 
             ViewData["category"] = categoryList;
-
             return View(book);
         }
 
@@ -134,18 +146,14 @@ namespace BokToppen.Controllers
             }
 
             // Hämtar datan sparad i sessionen och hitta bokinlägget med ett visst id
-            var books = HttpContext.Session.GetObject<List<BookModel>>("books");
-            int bookIndex = books.FindIndex(x => x.Id == book.Id);
+            int affectedRows = bm.UpdateBook(book, out string error);
             
-            if (bookIndex != -1)
+            if (affectedRows <= 0)
             {
-                book.User = books[bookIndex].User;
-                books[bookIndex] = book;
+                TempData["unsuccessful"] = "Bokinlägget kunde inte uppdateras";
             }
 
-            HttpContext.Session.SetObject("books", books);
-
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Books", new {id = book.Id});
         }
 
         [HttpPost]
@@ -172,14 +180,30 @@ namespace BokToppen.Controllers
             return RedirectToAction("Index");
         }
 
-        private BookModel? GetBookById(int id)
-        {
-            List<BookModel> books = HttpContext.Session.GetObject<List<BookModel>>("books");
-            BookModel? book = books.Where(b => b.Id == id).FirstOrDefault();
-            return book;
+        // [HttpGet]
+        // public ActionResult SearchTitle(string q){
 
-           
-        }
+        //     // Kollar om boken med idt finns
+        //     var 
+        //     if (book != null)
+        //     {
+        //         //Ta bort bok från listan
+        //         int rowsAffected = bm.DeleteBook(id, out string error);
+        //         if (rowsAffected <= 0)
+        //         {
+        //             TempData["unsuccessful"] = "Det gick inte att ta bort inlägget. " + error;
+        //         }
+
+        //     } 
+        //     else 
+        //     {
+        //         TempData["unsuccessful"] = " Det gick inte att ta bort inlägget :(. " + bookError;
+        //     }
+
+        //     return RedirectToAction("Index");
+        // }
+
+
 
     }
 }

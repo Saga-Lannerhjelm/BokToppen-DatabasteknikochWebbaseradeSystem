@@ -25,7 +25,7 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Email" class="form-label">Email</label>
-                <input type="password" asp-for="Email" name="email" class="form-control">
+                <input type="email" asp-for="Email" name="email" class="form-control">
                 @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
             </div>
             <div class="mb-3">

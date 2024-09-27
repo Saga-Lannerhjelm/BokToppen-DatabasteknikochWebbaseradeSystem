@@ -50,7 +50,7 @@ namespace BokToppen.Models
                     ReviewModel review = new ReviewModel()
 
                     {
-                        Id = Convert.ToInt32(reader["re_Id"]),
+                        Id = Convert.ToInt32(reader["Re_Id"]),
                         Points = Convert.ToInt32(reader["Re_Rating"]),
                         Comment = reader["Re_Comment"].ToString(),
                         PublishedDate = Convert.ToDateTime(reader["Re_PublishedDate"]),
@@ -157,7 +157,7 @@ namespace BokToppen.Models
         }
 
 
-         public int DeleteReview(int Id, out string errormsg)
+        public int DeleteReview(int Id, out string errormsg)
         {
 
             SqlConnection dbConnection = NewConnection();

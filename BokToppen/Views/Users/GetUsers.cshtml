@@ -13,5 +13,9 @@
 {
     <p>@item.Username</p>
     <p>@item.Email</p>
+    <form method="post" asp-action="Delete" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "") px-2">
+            <input asp-for="@item.Id" type="hidden" value="@item.Id" name="id">
+            <button type="submit" class="btn btn-danger">Radera</button>
+        </form>
     <br/>
 }

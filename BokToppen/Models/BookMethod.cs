@@ -26,12 +26,18 @@ namespace BokToppen.Models
             dbConnection.ConnectionString = _connectionString;
             return dbConnection;
         }
-        public List<BookModel> GetBooks(out string errormsg)
+        public List<BookModel> GetBooks(string searchParam, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "SELECT * FROM Tbl_Books";
+            string query;
+
+            if (searchParam != "") query = "SELECT * FROM Tbl_Books WHERE Bo_Title LIKE @searchParams";
+            else query = "SELECT * FROM Tbl_Books";
+
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("searchParams", SqlDbType.NVarChar, 50).Value = "%" + searchParam + "%";
 
             SqlDataReader reader = null;
             var bookList = new List<BookModel>();
@@ -56,8 +62,12 @@ namespace BokToppen.Models
                         User = Convert.ToInt32(reader["Bo_UserId"]),
                     };
 
-
                     bookList.Add(book);
+                }
+                if (bookList.Count() == 0)
+                {
+                     errormsg = "Hittade inga bokinlägg";
+                    return bookList;
                 }
                 reader.Close();
                 return bookList;
@@ -163,6 +173,48 @@ namespace BokToppen.Models
                     errormsg = "Skapades inte en bok";
                 }
                 return (i);
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return 0;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
+
+        public int UpdateBook(BookModel book, out string errormsg)
+        {
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_Category = @category, Bo_Description = @description WHERE Bo_Id = @bookId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("bookId", SqlDbType.Int).Value = book.Id;
+            dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
+            dbCommand.Parameters.Add("isbn", SqlDbType.Char, 13).Value = book.ISBN;
+            dbCommand.Parameters.Add("category", SqlDbType.NVarChar, 20).Value = book.Category;
+            dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
+
+            try
+            {
+                dbConnection.Open();
+                int affectedRows = 0;
+
+                // ExecuteNonQuery returns the number of rows affected
+                affectedRows = dbCommand.ExecuteNonQuery();
+
+                if (affectedRows == 1)
+                {
+                    errormsg = "";
+                }
+                else
+                {
+                    errormsg = "Gick inte att uppdatera boken";
+                }
+                return affectedRows;
             }
             catch (Exception e)
             {

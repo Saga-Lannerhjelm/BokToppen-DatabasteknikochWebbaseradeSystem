@@ -15,6 +15,11 @@
 
 <p>@ViewBag.error</p>
 
+<form method="get" asp-controller="Books" asp-action="Index">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" name="q" aria-label="Search">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+
 <div class="d-flex justify-content-end @(ViewBag.UserIsLoggedIn ? "d-none" : "")">
     <a type="button" class="mb-2" asp-action="Create"><i class="bi bi-plus-square text-primary h2"></i></a>
 </div>
