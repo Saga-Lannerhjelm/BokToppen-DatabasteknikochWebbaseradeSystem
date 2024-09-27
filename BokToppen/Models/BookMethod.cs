@@ -26,18 +26,24 @@ namespace BokToppen.Models
             dbConnection.ConnectionString = _connectionString;
             return dbConnection;
         }
-        public List<BookModel> GetBooks(string searchParam, out string errormsg)
+        public List<BookModel> GetBooks(string searchParam, string filter, bool sortByPublishedDate, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query;
+            string query = "SELECT * FROM Tbl_Books";
 
-            if (searchParam != "") query = "SELECT * FROM Tbl_Books WHERE Bo_Title LIKE @searchParams";
-            else query = "SELECT * FROM Tbl_Books";
+             if (searchParam != null || filter != null) query += " WHERE";
+
+            if (searchParam != null) query += " Bo_Title LIKE @searchParams";
+            if (filter != null) query += " Bo_Category = @filterParams";
+            if (sortByPublishedDate) query += " ORDER BY Bo_PublicationYear";
 
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
-            dbCommand.Parameters.Add("searchParams", SqlDbType.NVarChar, 50).Value = "%" + searchParam + "%";
+
+            if (searchParam != null) dbCommand.Parameters.Add("searchParams", SqlDbType.NVarChar, 50).Value = "%" + searchParam + "%";
+            if (filter != null) dbCommand.Parameters.Add("filterParams", SqlDbType.NVarChar, 50).Value = filter;
+
 
             SqlDataReader reader = null;
             var bookList = new List<BookModel>();

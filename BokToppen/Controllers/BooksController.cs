@@ -15,19 +15,19 @@ namespace BokToppen.Controllers
         UserMethod um = new UserMethod();
         List<string> categoryList = new List<string>{ "Romantik", "Fantasi", "Science fiction", "Dystopisk", "Action & Äventyr", "Deckare", "Fakta", "Barnbok", "Ungdomsbok", "Roman", "Novell", "Biografi", "Poesi", };
 
-        public IActionResult Index(string q)
+        public IActionResult Index(string q, string filter, bool sortByPublishedDate)
         {
             var books = new List<BookModel>();
             var bm = new BookMethod();
             string error = "";
-            if (q == null)
-            {
-                books = bm.GetBooks("", out error);
-            }
-            else
-            {
-                books = bm.GetBooks(q, out error);
-            }
+            // if (q == null)
+            // {
+                books = bm.GetBooks(q, filter, sortByPublishedDate, out error);
+            // }
+            // else
+            // {
+            //     books = bm.GetBooks(q, out error);
+            // }
 
 
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;

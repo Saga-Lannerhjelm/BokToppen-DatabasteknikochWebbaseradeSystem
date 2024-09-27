@@ -15,9 +15,32 @@
 
 <p>@ViewBag.error</p>
 
-<form method="get" asp-controller="Books" asp-action="Index">
-    <input class="form-control mr-sm-2" type="search" placeholder="Search" name="q" aria-label="Search">
-    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+<form method="get" asp-controller="Books" asp-action="Index" class="mb-3">
+     <div class="mb-3">
+         <label @*asp-for="Category"*@ class="form-label">Sök</label>
+         <input class="form-control mr-sm-2" type="search" placeholder="Sök" name="q">
+     </div>
+    <div class="mb-3">
+        <label @*asp-for="Category"*@ class="form-label">Filtrera</label>
+        <select @*asp-for="Category"*@ class="form-select" name="filter">
+            <option selected disabled>Välj filter</option>
+            <option value="romantik">Romantik</option>
+            <option value="fantasi">Fantasi</option>
+            @*@foreach (var categorie in (List<string>)ViewData["category"])
+            {
+              <option value="@categorie">@categorie</option>
+            }*@ 
+        </select>
+    </div>
+     <div class="mb-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="flexCheckDefault" value="true" name="sortByPublishedDate">
+            <label class="form-check-label" for="flexCheckDefault">
+                Ordna efter böckernas publiceringsår
+            </label>
+        </div>
+     </div>
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sök</button>
 </form>
 
 <div class="d-flex justify-content-end @(ViewBag.UserIsLoggedIn ? "d-none" : "")">
