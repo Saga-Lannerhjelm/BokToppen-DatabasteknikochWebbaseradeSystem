@@ -46,7 +46,7 @@ namespace BokToppen.Controllers
             review.CreatorId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
             review.Points = Convert.ToInt32(review.Points);
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 ReviewMethod rm = new ReviewMethod();
 

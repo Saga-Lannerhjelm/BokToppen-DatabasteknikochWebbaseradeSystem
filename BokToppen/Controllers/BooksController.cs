@@ -10,6 +10,9 @@ namespace BokToppen.Controllers
 {
     public class BooksController : Controller
     {
+        BookMethod bm = new BookMethod();
+        ReviewMethod rm = new ReviewMethod();
+        UserMethod um = new UserMethod();
         List<string> categoryList = new List<string>{ "Romantik", "Fantasi", "Science fiction", "Dystopisk", "Action & Äventyr", "Deckare", "Fakta", "Barnbok", "Ungdomsbok", "Roman", "Novell", "Biografi", "Poesi", };
 
         public IActionResult Index()
@@ -26,12 +29,10 @@ namespace BokToppen.Controllers
 
         public IActionResult Details(int id)
         {
-            var bm = new BookMethod();
-            var rm = new ReviewMethod();
-            var um = new UserMethod();
 
             string bookError = "";
             string reviewError = "";
+            string userError = "";
                 
             var BookReviewsViewModel = new BookReviewsViewModel
             {
@@ -40,7 +41,7 @@ namespace BokToppen.Controllers
             };
 
             // Send username to view based on user id
-            ViewBag.user = um.GetUserName(BookReviewsViewModel.Book.User, out string userError);
+            ViewBag.user = BookReviewsViewModel.Reviews.Count() > 0 ? um.GetUserName(BookReviewsViewModel.Book.User, out userError) : "";
 
             ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
@@ -77,8 +78,7 @@ namespace BokToppen.Controllers
                 int antal = 0;
                 string error = "";
                 if (ModelState.IsValid)
-                {
-                    BookMethod bm = new BookMethod();
+                {  
 
                     antal = bm.InsertBook(book, out error);
 
@@ -151,24 +151,27 @@ namespace BokToppen.Controllers
         [HttpPost]
         public ActionResult Delete(int id){
 
-            // Hämtar datan sparad i sessionen och hitta bokinlägget med ett visst id
-            List<BookModel> books = HttpContext.Session.GetObject<List<BookModel>>("books");
-            int bookIndex = books.FindIndex(x => x.Id == id);
+            // Kollar om boken med idt finns
+            BookModel book = bm.GetBookById(id, out string bookError);
 
-            if (bookIndex != -1)
+            if (book != null)
             {
                 //Ta bort bok från listan
-                books.RemoveAt(bookIndex);
+                int rowsAffected = bm.DeleteBook(id, out string error);
+                if (rowsAffected <= 0)
+                {
+                    TempData["unsuccessful"] = "Det gick inte att ta bort inlägget. " + error;
+                }
 
-                HttpContext.Session.SetObject("books", books);
             } 
             else 
             {
-                TempData["unsuccessful"] = " Det gick inte att ta bort inlägget :(";
+                TempData["unsuccessful"] = " Det gick inte att ta bort inlägget :(. " + bookError;
             }
 
             return RedirectToAction("Index");
         }
+
         private BookModel? GetBookById(int id)
         {
             List<BookModel> books = HttpContext.Session.GetObject<List<BookModel>>("books");

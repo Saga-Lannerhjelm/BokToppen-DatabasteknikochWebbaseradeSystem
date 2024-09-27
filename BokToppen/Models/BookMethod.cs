@@ -174,5 +174,44 @@ namespace BokToppen.Models
                 dbConnection.Close();
             }
         }
+
+        public int DeleteBook(int Id, out string errormsg)
+        {
+
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "DELETE FROM Tbl_Books WHERE Bo_Id = @bookId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("bookId", SqlDbType.Int).Value = Id;
+
+            try
+            {
+                dbConnection.Open();
+                int affectedRows = 0;
+
+                // ExecuteNonQuery returns the number of rows affected
+                affectedRows = dbCommand.ExecuteNonQuery();
+
+                if (affectedRows == 1)
+                {
+                    errormsg = "";
+                }
+                else
+                {
+                    errormsg = "Gick inte att ta bort boken";
+                }
+                return affectedRows;
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return 0;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
     }
 }

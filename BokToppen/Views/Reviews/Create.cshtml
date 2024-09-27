@@ -6,6 +6,14 @@
 
 <p>@ViewBag.error</p>
 
+@{
+    if (TempData.ContainsKey("unsuccessful")){
+        <div class="alert alert-warning mt-2" role="alert">
+        @TempData["unsuccessful"]
+        </div>
+    }
+}
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Details" asp-route-id="@ViewBag.BookId">@ViewBag.BookTitle</a></li>

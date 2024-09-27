@@ -18,7 +18,7 @@ namespace BokToppen.Models
         public int Points { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]
-        [MinLength(10, ErrorMessage = "Kommentaren måste vara minst 10 tecken långt")]
+        [MinLength(5, ErrorMessage = "Kommentaren måste vara minst 5 tecken långt")]
         [StringLength(100, ErrorMessage = "Kommentaren är för lång. Den kan inte var längre än 100 tecken")]
         public string? Comment { get; set; }
 
