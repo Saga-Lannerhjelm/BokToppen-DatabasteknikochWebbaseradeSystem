@@ -9,14 +9,25 @@ namespace BokToppen.Models
 {
     public class ReviewMethod
     {
-        public List<ReviewModel> GetReviewsByBook(int bookId, out string errormsg)
+        private readonly string _connectionString;
+        
+        public ReviewMethod() {
+            _connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+        }
+
+        private SqlConnection NewConnection()
         {
             //Skapa SQL-connection
             SqlConnection dbConnection = new SqlConnection();
 
             // Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            dbConnection.ConnectionString = _connectionString;
+            return dbConnection;
+        }
+
+        public List<ReviewModel> GetReviewsByBook(int bookId, out string errormsg)
+        {
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT Tbl_Reviews.*, Tbl_User.Us_Username AS Username FROM Tbl_Reviews INNER JOIN Tbl_User On Tbl_User.Us_Id = Tbl_Reviews.Re_UserId WHERE Re_BookId = @bookId";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -34,7 +45,7 @@ namespace BokToppen.Models
 
                 reader = dbCommand.ExecuteReader();
 
-                 while(reader.Read())
+                while (reader.Read())
                 {
                     ReviewModel review = new ReviewModel()
 
@@ -66,12 +77,7 @@ namespace BokToppen.Models
 
         public int InsertReview(ReviewModel review, out string errormsg)
         {
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            // Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            SqlConnection dbConnection = NewConnection();
 
             string query = "INSERT INTO Tbl_Reviews (Re_Rating, Re_Comment, Re_UserId, Re_BookId) VALUES (@rating, @comment, @userid, @bookid)";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);

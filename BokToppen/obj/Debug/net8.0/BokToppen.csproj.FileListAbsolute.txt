@@ -360,3 +360,4 @@
 /Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/bin/Debug/net8.0/refs/System.Xml.XPath.XDocument.dll
 /Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/bin/Debug/net8.0/refs/WindowsBase.dll
 /Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/obj/Debug/net8.0/BokToppen.MvcApplicationPartsAssemblyInfo.cs
+/Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/obj/Debug/net8.0/BokToppen.sourcelink.json

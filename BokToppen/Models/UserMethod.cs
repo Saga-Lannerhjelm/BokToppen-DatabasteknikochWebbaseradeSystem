@@ -21,6 +21,17 @@ namespace BokToppen.Models
             _connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
         }
 
+        private SqlConnection NewConnection()
+        {
+            //Skapa SQL-connection
+            SqlConnection dbConnection = new SqlConnection();
+
+            // Koppling mot server
+            dbConnection.ConnectionString = _connectionString;
+            return dbConnection;
+        }
+
+        // Implementerad baserat på kodexempel från https://www.thatsoftwaredude.com/content/6218/how-to-encrypt-passwords-using-sha-256-in-c-and-net
         private byte[] CalculateSHA256(string str)
         {
             SHA256 sha256 = SHA256.Create();
@@ -35,11 +46,7 @@ namespace BokToppen.Models
         {
             byte[] hashedIncomingPassword = CalculateSHA256(user.Password);
             
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            //Koppling mot server
-            dbConnection.ConnectionString = _connectionString;
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT Us_Id, Us_Password FROM Tbl_User WHERE Us_Username = @username";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -93,11 +100,7 @@ namespace BokToppen.Models
         public int InsertUser(UserModel us, out string errormsg)
         {
 
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            //Koppling mot server
-            dbConnection.ConnectionString = _connectionString;
+            SqlConnection dbConnection = NewConnection();
 
             string query = "INSERT INTO Tbl_User (Us_Username, Us_Email, Us_Password) VALUES (@username, @email, @password); SELECT SCOPE_IDENTITY()";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -140,12 +143,7 @@ namespace BokToppen.Models
 
         public string GetUserName(int userId, out string errormsg)
         {
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            //Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT Us_Username FROM Tbl_User WHERE Us_Id = @userId";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -185,12 +183,7 @@ namespace BokToppen.Models
 
         public int GetUserId(string userName, out string errormsg)
         {
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            //Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT Us_Id FROM Tbl_User WHERE Us_Username = @username";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -229,12 +222,7 @@ namespace BokToppen.Models
 
         public List<UserModel> GetUsers(out string errormsg)
         {
-            //Skapa SQL-connection
-            SqlConnection dbConnection = new SqlConnection();
-
-            //Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT * FROM Tbl_User";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);

@@ -9,23 +9,26 @@ namespace BokToppen.Models
 {
     public class BookMethod
     {
-        public BookMethod() {}
-
+        private readonly string _connectionString;
+        
+        public BookMethod() {
+            _connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+        }
+        
         UserMethod um = new UserMethod();
-
-        private static SqlConnection ConnectToServer()
+       
+        private SqlConnection NewConnection()
         {
             //Skapa SQL-connection
             SqlConnection dbConnection = new SqlConnection();
 
-            //Koppling mot server
-            // dbConnection.ConnectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-            dbConnection.ConnectionString = "Data Source=localhost, 1433;Database=Lab2DB;User Id=sa;Password=lab2_ReDo;Encrypt=True;TrustServerCertificate=True;";
+            // Koppling mot server
+            dbConnection.ConnectionString = _connectionString;
             return dbConnection;
         }
         public List<BookModel> GetBooks(out string errormsg)
         {
-            SqlConnection dbConnection = ConnectToServer();
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT * FROM Tbl_Books";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -72,7 +75,7 @@ namespace BokToppen.Models
 
         public BookModel GetBookById(int bookId, out string errormsg)
         {
-            SqlConnection dbConnection = ConnectToServer();
+            SqlConnection dbConnection = NewConnection();
 
             string query = "SELECT Tbl_Books.*, Au_Name AS Bo_Authors FROM Tbl_Books INNER JOIN Tbl_Books_Authors ON Bo_Id = Tbl_Books_Authors.BA_BookID INNER JOIN Tbl_Authors ON Tbl_Books_Authors.BA_AuthorID = Au_Id WHERE Bo_Id = @bookid;";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -131,7 +134,7 @@ namespace BokToppen.Models
         public int InsertBook(BookModel book, out string errormsg)
         {
 
-            SqlConnection dbConnection = ConnectToServer();
+            SqlConnection dbConnection = NewConnection();
 
             string query = "INSERT INTO Tbl_Books (Bo_Title, Bo_ISBN, Bo_Category, Bo_Description, Bo_PublicationYear, Bo_UserId) VALUES (@title, @isbn, @category, @description, @publicationYear, @userId)";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
