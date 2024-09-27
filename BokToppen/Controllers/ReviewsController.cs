@@ -13,6 +13,8 @@ namespace BokToppen.Controllers
 {
     public class ReviewsController : Controller
     {
+        BookMethod bm = new BookMethod();
+        ReviewMethod rm = new ReviewMethod();
         List<int> ratingNumbers = new List<int>{1, 2, 3, 4, 5};
 
         [HttpGet]
@@ -24,7 +26,6 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var bm = new BookMethod();
             var book = bm.GetBookById(id, out string error);
 
             if (book != null)
@@ -48,7 +49,6 @@ namespace BokToppen.Controllers
 
             if (ModelState.IsValid)
             {
-                ReviewMethod rm = new ReviewMethod();
 
                 int antalRowsAffected = rm.InsertReview(review, out string error);
 
@@ -69,21 +69,24 @@ namespace BokToppen.Controllers
         [HttpPost]
         public IActionResult Delete(int ratingId, int bookId){
 
-            // Hämta reviews listan och hitta det omdöme som har rätt id
-            var reviews = HttpContext.Session.GetObject<List<ReviewModel>>("reviews");
-            int reviewIndex = reviews.FindIndex(r => r.Id == ratingId);
+            // Kollar om boken med idt finns
+            int reviewId = rm.GetReviewId(ratingId, out string reviewError);
 
-            if (reviewIndex != -1)
+            if (reviewId > 0)
             {
-                // Ta bort omdöme från listan
-                reviews.RemoveAt(reviewIndex);
-                HttpContext.Session.SetObject("reviews", reviews);
-            }
-            else
+                //Ta bort bok från listan
+                int rowsAffected = rm.DeleteReview(ratingId, out string error);
+                if (rowsAffected <= 0)
+                {
+                    TempData["unsuccessful"] = "Det gick inte att ta bort omdömet. " + error;
+                }
+
+            } 
+            else 
             {
-                TempData["unsuccessful"] = "Det gick inte att ta bort omdömet";
+                TempData["unsuccessful"] = " Det gick inte att ta bort omdömet :(. " + reviewError;
             }
-            
+
             return RedirectToAction("Details", "Books", new {id = bookId});
         }
 

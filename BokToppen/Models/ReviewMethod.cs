@@ -50,6 +50,7 @@ namespace BokToppen.Models
                     ReviewModel review = new ReviewModel()
 
                     {
+                        Id = Convert.ToInt32(reader["re_Id"]),
                         Points = Convert.ToInt32(reader["Re_Rating"]),
                         Comment = reader["Re_Comment"].ToString(),
                         PublishedDate = Convert.ToDateTime(reader["Re_PublishedDate"]),
@@ -68,6 +69,45 @@ namespace BokToppen.Models
             {
                 errormsg = e.Message;
                 return null;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
+
+         public int GetReviewId(int reviewId, out string errormsg)
+        {
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "SELECT Re_Id FROM Tbl_Reviews WHERE Re_Id = @reviewId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("reviewId", SqlDbType.Int).Value = reviewId;
+
+            SqlDataReader reader = null;
+            int id = 0;
+
+            errormsg = "";
+
+            try
+            {
+                dbConnection.Open();
+
+                reader = dbCommand.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    id = Convert.ToInt32(reader["Re_Id"]);
+                }
+
+                reader.Close();
+                return id;
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return 0;
             }
             finally
             {
@@ -104,6 +144,46 @@ namespace BokToppen.Models
                     errormsg = "Omdömet skapades inte";
                 }
                 return (i);
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return 0;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
+
+
+         public int DeleteReview(int Id, out string errormsg)
+        {
+
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "DELETE FROM Tbl_Reviews WHERE Re_Id = @reviewId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("reviewId", SqlDbType.Int).Value = Id;
+
+            try
+            {
+                dbConnection.Open();
+                int affectedRows = 0;
+
+                // ExecuteNonQuery returns the number of rows affected
+                affectedRows = dbCommand.ExecuteNonQuery();
+
+                if (affectedRows == 1)
+                {
+                    errormsg = "";
+                }
+                else
+                {
+                    errormsg = "Gick inte att ta bort omdömet";
+                }
+                return affectedRows;
             }
             catch (Exception e)
             {
