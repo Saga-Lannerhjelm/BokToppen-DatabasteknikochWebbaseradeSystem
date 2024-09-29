@@ -30,8 +30,6 @@ namespace BokToppen.Models
 
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
-
-        // [Required(ErrorMessage = "Fältet kan inte vara tomt")]
         public List<string>? Authors { get; set; } = new List<string>();
     }
 }

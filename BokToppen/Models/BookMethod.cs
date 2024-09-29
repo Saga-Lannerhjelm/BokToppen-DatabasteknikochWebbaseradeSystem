@@ -70,7 +70,7 @@ namespace BokToppen.Models
                         Id = Convert.ToInt32(reader["Bo_Id"]),
                         Title = reader["Bo_Title"].ToString(),
                         ISBN = reader["Bo_ISBN"].ToString(),
-                        Category = reader["Bo_Category"].ToString(),
+                        Category = reader["Bo_CategoryId"].ToString(),
                         Description = reader["Bo_Description"].ToString(),
                         PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]),
                         User = Convert.ToInt32(reader["Bo_UserId"]),
@@ -156,12 +156,12 @@ namespace BokToppen.Models
             }
         }
 
-        public int InsertBook(BookModel book, out string errormsg)
+        public int InsertBook(BookModel book, string authors, out string errormsg)
         {
 
             SqlConnection dbConnection = NewConnection();
 
-            string query = "INSERT INTO Tbl_Books (Bo_Title, Bo_ISBN, Bo_CategoryId, Bo_Description, Bo_PublicationYear, Bo_UserId) VALUES (@title, @isbn, @categoryId, @description, @publicationYear, @userId)";
+            string query = "EXEC addBook @title, @isbn, @categoryId, @description, @publicationYear, @userId, @authors";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
@@ -170,6 +170,7 @@ namespace BokToppen.Models
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
             dbCommand.Parameters.Add("publicationYear", SqlDbType.Int).Value = book.PublicationYear;
             dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = book.User;
+            dbCommand.Parameters.Add("authors", SqlDbType.NVarChar, 50).Value = authors;
 
             try
             {
@@ -179,7 +180,7 @@ namespace BokToppen.Models
                 // ExecuteNonQuery returns the number of rows affected
                 i = dbCommand.ExecuteNonQuery();
 
-                if (i == 1)
+                if (i > 0)
                 {
                     errormsg = "";
                 }

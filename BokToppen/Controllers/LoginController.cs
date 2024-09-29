@@ -38,36 +38,7 @@ namespace BokToppen.Controllers
             return View("Index", user);
         }
 
-        [HttpGet]
-        public IActionResult CreateUser()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult CreateUser(UserModel user)
-        {
-            string error = "";
-            if (ModelState.IsValid)
-            {
-                UserMethod um = new UserMethod();
-
-                int insertedUserId = um.InsertUser(user, out error);
-                if (insertedUserId > 0)
-                {
-                    HttpContext.Session.SetString("UserId", insertedUserId.ToString());
-                    return RedirectToAction("Index", "Books");
-                }
-                else
-                {
-                    // Lägger till ett felmeddelande
-                    ModelState.AddModelError(nameof(user.Password), error);
-                }
-            }
-            return View();
-        }
-
-        [HttpPost]
+                [HttpPost]
         public IActionResult LougOut()
         {
             HttpContext.Session.Remove("UserId");

@@ -57,8 +57,11 @@ namespace BokToppen.Controllers
                     Reviews = rm.GetReviewsByBook(id, out reviewError)
                 };
 
+                
+                string username = um.GetUserName(BookReviewsViewModel.Book.User, out userError);
+
                 // Send username to view based on user id
-                ViewBag.user = um.GetUserName(BookReviewsViewModel.Book.User, out userError);
+                ViewBag.user = (username != null) ? username : "'Borttagen användare'";
 
                 ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
                 ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
@@ -95,21 +98,25 @@ namespace BokToppen.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(BookModel book){
+        public ActionResult Create(BookModel book, string authors){
             try
             {
                 book.User = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
                 int antal = 0;
                 string bookError = "";
+
+                if (authors == "" && authors != null) ModelState.AddModelError("authors", "Fältet kan inte vara tomt");
+                if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år");
+
                 if (ModelState.IsValid)
                 {  
 
-                    antal = bm.InsertBook(book, out bookError);
+                    antal = bm.InsertBook(book, authors, out bookError);
 
-                    if (bookError == "")
+                    if (bookError != "" && bookError != null)
                     {
-                        TempData["unsuccessful"] = "Npgot blev fel. " + bookError;
+                        TempData["unsuccessful"] = "Något blev fel. " + bookError;
                     }
 
                     if (antal != 0)
@@ -123,6 +130,8 @@ namespace BokToppen.Controllers
                 //Tempdata to show unseccess
                 TempData["unsuccessful"] = "Något blev fel. " + e.Message;
             }
+
+            ViewBag.authors = authors;
             
             List<CategoryModel> categoryList = cm.GetCategories(out string error);
 

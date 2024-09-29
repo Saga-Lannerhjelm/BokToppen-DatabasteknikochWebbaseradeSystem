@@ -13,12 +13,6 @@ namespace BokToppen.Controllers
     {
         UserMethod um = new UserMethod();
 
-          public IActionResult Index()
-        {
-
-            return View();
-        }
-
         public IActionResult GetUsers()
         {
             List<UserModel> userList = new List<UserModel>();
@@ -29,6 +23,41 @@ namespace BokToppen.Controllers
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
 
             return View(userList);
+        }
+
+         [HttpGet]
+        public IActionResult CreateUser()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateUser(UserModel user)
+        {
+            string error = "";
+
+            if (user.Password.Length < 8)
+            {
+                ModelState.AddModelError(nameof(user.Password), "Lösenordet måste vara mint 8 tecken långt");
+            }
+
+            if (ModelState.IsValid)
+            {
+                UserMethod um = new UserMethod();
+
+                int insertedUserId = um.InsertUser(user, out error);
+                if (insertedUserId > 0)
+                {
+                    HttpContext.Session.SetString("UserId", insertedUserId.ToString());
+                    return RedirectToAction("Index", "Books");
+                }
+                else
+                {
+                    // Lägger till ett felmeddelande
+                    ModelState.AddModelError(nameof(user.Password), error);
+                }
+            }
+            return View();
         }
 
         [HttpPost]
