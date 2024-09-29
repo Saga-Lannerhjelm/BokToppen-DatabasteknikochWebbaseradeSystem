@@ -10,28 +10,33 @@ namespace BokToppen.Controllers
 {
     public class BooksController : Controller
     {
-        BookMethod bm = new BookMethod();
-        ReviewMethod rm = new ReviewMethod();
-        UserMethod um = new UserMethod();
-        List<string> categoryList = new List<string>{ "Romantik", "Fantasi", "Science fiction", "Dystopisk", "Action & Äventyr", "Deckare", "Fakta", "Barnbok", "Ungdomsbok", "Roman", "Novell", "Biografi", "Poesi", };
+        readonly BookMethod bm = new BookMethod();
+        readonly ReviewMethod rm = new ReviewMethod();
+        readonly UserMethod um = new UserMethod();
+        readonly CategoryMethod cm = new CategoryMethod();
 
         public IActionResult Index(string q, string filter, bool sortByPublishedDate)
         {
             var books = new List<BookModel>();
             var bm = new BookMethod();
             string error = "";
-            // if (q == null)
-            // {
-                books = bm.GetBooks(q, filter, sortByPublishedDate, out error);
-            // }
-            // else
-            // {
-            //     books = bm.GetBooks(q, out error);
-            // }
-
+            
+            books = bm.GetBooks(q, filter, sortByPublishedDate, out error);
 
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
             ViewBag.error = error;
+
+            List<CategoryModel> categoryList = cm.GetCategories(out string categoryError);
+
+            if (error == null)
+            {
+                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + categoryError;
+            }
+            
+            ViewData["category"] = categoryList;
+            ViewBag.query = q;
+            ViewBag.filter = filter;
+            ViewBag.sort = sortByPublishedDate;
 
             return View(books);
         }
@@ -77,6 +82,14 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
+            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+
+            if (error == null)
+            {
+                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + error;
+                return RedirectToAction("Index");
+            }
+            
             ViewData["category"] = categoryList;
             return View();
         }
@@ -88,26 +101,35 @@ namespace BokToppen.Controllers
                 book.User = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
                 int antal = 0;
-                string error = "";
+                string bookError = "";
                 if (ModelState.IsValid)
                 {  
 
-                    antal = bm.InsertBook(book, out error);
+                    antal = bm.InsertBook(book, out bookError);
 
-                    ViewBag.error = error;
-                    ViewBag.antal = antal;
+                    if (bookError == "")
+                    {
+                        TempData["unsuccessful"] = "Npgot blev fel. " + bookError;
+                    }
 
                     if (antal != 0)
                     {
                         return RedirectToAction("Index");  
                     }
                 }
-                // ViewBag.authors = authors;
             }
             catch (Exception e)
             {
                 //Tempdata to show unseccess
                 TempData["unsuccessful"] = "Något blev fel. " + e.Message;
+            }
+            
+            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+
+            if (error == null)
+            {
+                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + error;
+                return RedirectToAction("Index");
             }
             
             ViewData["category"] = categoryList;
@@ -132,6 +154,14 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index");
             }
 
+            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+
+            if (error == null)
+            {
+                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + error;
+                return RedirectToAction("Detials", "Books", new {id});
+            }
+            
             ViewData["category"] = categoryList;
             return View(book);
         }
@@ -141,6 +171,14 @@ namespace BokToppen.Controllers
 
             if (!ModelState.IsValid)
             {
+                List<CategoryModel> categoryList = cm.GetCategories(out string categoryError);
+
+                if (categoryError == null)
+                {
+                    TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + categoryError;
+                    return RedirectToAction("Detials", "Books", new { id = book.Id});
+                }
+                
                 ViewData["category"] = categoryList;
                 return View(book);
             }
@@ -179,31 +217,5 @@ namespace BokToppen.Controllers
 
             return RedirectToAction("Index");
         }
-
-        // [HttpGet]
-        // public ActionResult SearchTitle(string q){
-
-        //     // Kollar om boken med idt finns
-        //     var 
-        //     if (book != null)
-        //     {
-        //         //Ta bort bok från listan
-        //         int rowsAffected = bm.DeleteBook(id, out string error);
-        //         if (rowsAffected <= 0)
-        //         {
-        //             TempData["unsuccessful"] = "Det gick inte att ta bort inlägget. " + error;
-        //         }
-
-        //     } 
-        //     else 
-        //     {
-        //         TempData["unsuccessful"] = " Det gick inte att ta bort inlägget :(. " + bookError;
-        //     }
-
-        //     return RedirectToAction("Index");
-        // }
-
-
-
     }
 }

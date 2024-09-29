@@ -18,23 +18,21 @@
 <form method="get" asp-controller="Books" asp-action="Index" class="mb-3">
      <div class="mb-3">
          <label @*asp-for="Category"*@ class="form-label">Sök</label>
-         <input class="form-control mr-sm-2" type="search" placeholder="Sök" name="q">
+         <input class="form-control mr-sm-2" type="search" placeholder="Sök" name="q" value="@(ViewBag.query != null ? @ViewBag.query : "")">
      </div>
     <div class="mb-3">
-        <label @*asp-for="Category"*@ class="form-label">Filtrera</label>
-        <select @*asp-for="Category"*@ class="form-select" name="filter">
-            <option selected disabled>Välj filter</option>
-            <option value="romantik">Romantik</option>
-            <option value="fantasi">Fantasi</option>
-            @*@foreach (var categorie in (List<string>)ViewData["category"])
+        <label class="form-label">Filtrera</label>
+        <select class="form-select" name="filter">
+            <option value="0">Inget filter valt</option>
+            @foreach (var category in (List<CategoryModel>)ViewData["category"])
             {
-              <option value="@categorie">@categorie</option>
-            }*@ 
+              <option value="@category.Id" selected="@(ViewBag.filter != null ? category.Id == int.Parse(ViewBag.filter) : false)">@category.Category</option>
+            }
         </select>
     </div>
      <div class="mb-3">
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="flexCheckDefault" value="true" name="sortByPublishedDate">
+            <input class="form-check-input" type="checkbox" id="flexCheckDefault" value="true" checked="@(ViewBag.sort != null ? ViewBag.sort : false)" name="sortByPublishedDate">
             <label class="form-check-label" for="flexCheckDefault">
                 Ordna efter böckernas publiceringsår
             </label>

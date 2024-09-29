@@ -11,9 +11,10 @@ namespace BokToppen.Models
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]        
         public string? Title { get; set; }
+        public string? Category { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]
-        public string? Category { get; set; }
+        public int CategoryId { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]
         [StringLength(1000, ErrorMessage = "Beskrivningen kan inte vara mer än 1000 tecken lång")]

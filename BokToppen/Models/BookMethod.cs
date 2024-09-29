@@ -32,17 +32,25 @@ namespace BokToppen.Models
 
             string query = "SELECT * FROM Tbl_Books";
 
-             if (searchParam != null || filter != null) query += " WHERE";
+             if (searchParam != null || (filter != null && filter != "0")) query += " WHERE";
 
             if (searchParam != null) query += " Bo_Title LIKE @searchParams";
-            if (filter != null) query += " Bo_Category = @filterParams";
-            if (sortByPublishedDate) query += " ORDER BY Bo_PublicationYear";
+            if (filter != null && filter != "0")
+            {
+                string andOperator = searchParam != null ? " AND" : "";
+                query +=  andOperator + " Bo_CategoryId = @filterParams";
+            } 
+            if (sortByPublishedDate)
+            {
+                string andOperator = (searchParam != null || (filter != null && filter != "0")) ? " AND" : "";
+                query += " ORDER BY Bo_PublicationYear";
+            }
 
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
 
             if (searchParam != null) dbCommand.Parameters.Add("searchParams", SqlDbType.NVarChar, 50).Value = "%" + searchParam + "%";
-            if (filter != null) dbCommand.Parameters.Add("filterParams", SqlDbType.NVarChar, 50).Value = filter;
+            if (filter != null && filter != "0") dbCommand.Parameters.Add("filterParams", SqlDbType.NVarChar, 50).Value = filter;
 
 
             SqlDataReader reader = null;
@@ -93,7 +101,7 @@ namespace BokToppen.Models
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "SELECT Tbl_Books.*, Au_Name AS Bo_Authors FROM Tbl_Books INNER JOIN Tbl_Books_Authors ON Bo_Id = Tbl_Books_Authors.BA_BookID INNER JOIN Tbl_Authors ON Tbl_Books_Authors.BA_AuthorID = Au_Id WHERE Bo_Id = @bookid;";
+            string query = "SELECT Tbl_Books.*, Au_Name AS Bo_Authors, Ca_Category AS Bo_CategoryName FROM Tbl_Books INNER JOIN Tbl_Books_Authors ON Bo_Id = Tbl_Books_Authors.BA_BookID INNER JOIN Tbl_Authors ON Tbl_Books_Authors.BA_AuthorID = Au_Id INNER JOIN Tbl_Categories ON Tbl_Categories.Ca_Id = Bo_CategoryId WHERE Bo_Id = @bookid;";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("bookid", SqlDbType.Int).Value = bookId;
@@ -116,7 +124,8 @@ namespace BokToppen.Models
                         book.Id = Convert.ToInt32(reader["Bo_Id"]);
                         book.Title = reader["Bo_Title"].ToString();
                         book.ISBN = reader["Bo_ISBN"].ToString();
-                        book.Category = reader["Bo_Category"].ToString();
+                        book.Category = reader["Bo_CategoryName"].ToString();
+                        book.CategoryId = Convert.ToInt32(reader["Bo_CategoryId"]);
                         book.Description = reader["Bo_Description"].ToString();
                         book.PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]);
                         book.PublishedDate = Convert.ToDateTime(reader["Bo_CreatedAt"]);
@@ -152,12 +161,12 @@ namespace BokToppen.Models
 
             SqlConnection dbConnection = NewConnection();
 
-            string query = "INSERT INTO Tbl_Books (Bo_Title, Bo_ISBN, Bo_Category, Bo_Description, Bo_PublicationYear, Bo_UserId) VALUES (@title, @isbn, @category, @description, @publicationYear, @userId)";
+            string query = "INSERT INTO Tbl_Books (Bo_Title, Bo_ISBN, Bo_CategoryId, Bo_Description, Bo_PublicationYear, Bo_UserId) VALUES (@title, @isbn, @categoryId, @description, @publicationYear, @userId)";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
             dbCommand.Parameters.Add("isbn", SqlDbType.Char, 13).Value = book.ISBN;
-            dbCommand.Parameters.Add("category", SqlDbType.NVarChar, 20).Value = book.Category;
+            dbCommand.Parameters.Add("categoryId", SqlDbType.NVarChar, 20).Value = book.CategoryId;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
             dbCommand.Parameters.Add("publicationYear", SqlDbType.Int).Value = book.PublicationYear;
             dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = book.User;
@@ -195,13 +204,13 @@ namespace BokToppen.Models
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_Category = @category, Bo_Description = @description WHERE Bo_Id = @bookId";
+            string query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_CategoryId = @categoryId, Bo_Description = @description WHERE Bo_Id = @bookId";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("bookId", SqlDbType.Int).Value = book.Id;
             dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
             dbCommand.Parameters.Add("isbn", SqlDbType.Char, 13).Value = book.ISBN;
-            dbCommand.Parameters.Add("category", SqlDbType.NVarChar, 20).Value = book.Category;
+            dbCommand.Parameters.Add("categoryId", SqlDbType.NVarChar, 20).Value = book.CategoryId;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
 
             try

@@ -29,12 +29,12 @@
           @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
         </div>
         <div class="mb-3">
-          <label asp-for="Category" class="form-label">Kategori</label>
-          <select asp-for="Category" class="form-select" aria-label="Default select example">
+          <label asp-for="CategoryId" class="form-label">Kategori</label>
+          <select asp-for="CategoryId" class="form-select" aria-label="Default select example">
             @{
-              foreach (var category in ViewData["category"] as List<string>)
+              foreach (var category in ViewData["category"] as List<CategoryModel>)
               {
-                <option value="@category" selected="@category == @Model.Category">@category</option>
+                <option value="@category.Id" selected="@(category.Id == Model.CategoryId)">@category.Category</option>
               }
             }
           </select>
