@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BokToppen")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+002d073a8994bad01c84028d02dc6b8b1d945353")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f30116386ad1fe8276444fa83c37066c000a2f3f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BokToppen")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BokToppen")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

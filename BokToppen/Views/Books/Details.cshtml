@@ -25,9 +25,18 @@
     <p class="card-text">@Model.Book.Description</p>
     <p class="card-text">ISBN: @Model.Book.ISBN</p>
     <p class="card-text">Författare: 
-        @foreach (var author in Model.Book.Authors)
-        {
-            <span>@author</span><span> </span>
+        @{
+            if(Model.Book.Authors.Count() > 1)
+            {
+                @foreach (var author in Model.Book.Authors)
+                {
+                    <span>@author</span><span>, </span>
+                }
+            }
+            else
+            {
+                <span>@Model.Book.Authors[0]</span>
+            }
         }
     </p>
     <div class="d-flex">

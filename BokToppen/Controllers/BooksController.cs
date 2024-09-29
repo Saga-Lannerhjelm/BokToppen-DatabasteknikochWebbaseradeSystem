@@ -176,7 +176,9 @@ namespace BokToppen.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(BookModel book){
+        public ActionResult Edit(BookModel book)
+        {
+            if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år mellan år 1000 och " + DateTime.Now.Year);
 
             if (!ModelState.IsValid)
             {

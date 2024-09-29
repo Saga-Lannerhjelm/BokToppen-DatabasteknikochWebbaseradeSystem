@@ -205,13 +205,14 @@ namespace BokToppen.Models
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_CategoryId = @categoryId, Bo_Description = @description WHERE Bo_Id = @bookId";
+            string query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_CategoryId = @categoryId, Bo_PublicationYear = @publicationYear, Bo_Description = @description WHERE Bo_Id = @bookId";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("bookId", SqlDbType.Int).Value = book.Id;
             dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
             dbCommand.Parameters.Add("isbn", SqlDbType.Char, 13).Value = book.ISBN;
             dbCommand.Parameters.Add("categoryId", SqlDbType.NVarChar, 20).Value = book.CategoryId;
+            dbCommand.Parameters.Add("publicationYear", SqlDbType.NVarChar, 20).Value = book.PublicationYear;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
 
             try
