@@ -73,7 +73,7 @@ namespace BokToppen.Models
                         Category = reader["Bo_CategoryId"].ToString(),
                         Description = reader["Bo_Description"].ToString(),
                         PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]),
-                        User = Convert.ToInt32(reader["Bo_UserId"]),
+                        User = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null,
                     };
 
                     bookList.Add(book);
@@ -129,7 +129,7 @@ namespace BokToppen.Models
                         book.Description = reader["Bo_Description"].ToString();
                         book.PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]);
                         book.PublishedDate = Convert.ToDateTime(reader["Bo_CreatedAt"]);
-                        book.User = Convert.ToInt32(reader["Bo_UserId"]);
+                        book.User = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null;
                     }
 
                     // If there exists many book, they are added to the list in this while loop,

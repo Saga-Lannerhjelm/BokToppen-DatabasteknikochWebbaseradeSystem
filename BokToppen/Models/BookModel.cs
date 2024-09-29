@@ -7,7 +7,7 @@ namespace BokToppen.Models
     {
         public int Id { get; set; }
 
-        public int User { get; set; }
+        public int? User { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]        
         public string? Title { get; set; }

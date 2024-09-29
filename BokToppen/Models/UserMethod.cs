@@ -141,7 +141,7 @@ namespace BokToppen.Models
             }
         }
 
-        public string GetUserName(int userId, out string errormsg)
+        public string GetUserName(int? userId, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
 
