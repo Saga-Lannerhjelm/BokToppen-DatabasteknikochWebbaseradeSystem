@@ -1,10 +1,21 @@
-@model BokToppen.Models.UserModel
+@model IEnumerable<BokToppen.Models.UserModel>
 @{
-    ViewData["Title"] = "Test";
+    ViewData["Title"] = "Användare";
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <p>Heloooooo</p>
+    <p>@ViewBag.error</p>
 </div>
+
+@foreach (var item in Model)
+{
+    <p>@item.Username</p>
+    <p>@item.Email</p>
+    <form method="post" asp-action="Delete" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "") px-2">
+            <input asp-for="@item.Id" type="hidden" value="@item.Id" name="id">
+            <button type="submit" class="btn btn-danger">Radera</button>
+        </form>
+    <br/>
+}

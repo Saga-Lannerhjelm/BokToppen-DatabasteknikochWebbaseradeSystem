@@ -27,6 +27,7 @@ namespace BokToppen.Models
             dbConnection.ConnectionString = _connectionString;
             return dbConnection;
         }
+        
         public List<BookModel> GetBooks(string searchParam, string filter, bool sortByPublishedDate, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
@@ -71,7 +72,7 @@ namespace BokToppen.Models
                         Id = Convert.ToInt32(reader["Bo_Id"]),
                         Title = reader["Bo_Title"].ToString(),
                         ISBN = reader["Bo_ISBN"].ToString(),
-                        Category = reader["Bo_CategoryId"].ToString(),
+                        CategoryId = Convert.ToInt32(reader["Bo_CategoryId"]),
                         Description = reader["Bo_Description"].ToString(),
                         PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]),
                         UserId = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null,
@@ -180,12 +181,12 @@ namespace BokToppen.Models
             try
             {
                 dbConnection.Open();
-                int i = 0;
+                int affectedRows = 0;
 
                 // ExecuteNonQuery returns the number of rows affected
-                i = dbCommand.ExecuteNonQuery();
+                affectedRows = dbCommand.ExecuteNonQuery();
 
-                if (i > 0)
+                if (affectedRows > 0)
                 {
                     errormsg = "";
                 }
@@ -193,7 +194,7 @@ namespace BokToppen.Models
                 {
                     errormsg = "Skapades inte en bok";
                 }
-                return (i);
+                return (affectedRows);
             }
             catch (Exception e)
             {

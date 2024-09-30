@@ -37,15 +37,15 @@ namespace BokToppen.Controllers
                 return View();
             }
 
-            TempData["unsuccessful"] = "Bokinlägget du försökte skapa ett omdömme på finns inte. " + error;
+            TempData["unsuccessful"] = "Bokinlägget du försökte skapa ett omdömme på finns inte. Error: " + error;
             return RedirectToAction("Index", "Books");
         }
 
         [HttpPost]
         public ActionResult Create(ReviewModel review, int bookId, string bookTitle){
 
-            review.CreatorId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
-            review.Points = Convert.ToInt32(review.Points);
+            review.UserId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
+            review.Rating = Convert.ToInt32(review.Rating);
 
             if (ModelState.IsValid)
             {
@@ -57,7 +57,7 @@ namespace BokToppen.Controllers
                     return RedirectToAction("Details", "Books", new {id = bookId});
                 }
                 
-                ViewBag.error = error;
+                TempData["unsuccessful"] = "Bokinlägget du försökte skapa ett omdömme på finns inte. Error: " + error;
             }
 
                 ViewBag.BookTitle = bookTitle;

@@ -36,13 +36,13 @@
               foreach (int rating in ratings)
               {
                 <div class="mx-2">
-                  <label asp-for="Points" class="form-label">@rating:</label>
-                  <input asp-for="Points" name="points" type="radio" class="form-check-input" value="@rating">
+                  <label asp-for="Rating" class="form-label">@rating:</label>
+                  <input asp-for="Rating" name="Rating" type="radio" class="form-check-input" value="@rating">
                 </div>
               }
             }
           </div>
-          @Html.ValidationMessageFor(m => m.Points, "", new { @class = "text-danger" })
+          @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger" })
         </div>
         <div class="mb-3">
           <label asp-for="Comment" class="form-label">Kommentar</label>

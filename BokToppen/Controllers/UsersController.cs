@@ -13,39 +13,43 @@ namespace BokToppen.Controllers
     {
         UserMethod um = new UserMethod();
 
-        public IActionResult GetUsers()
+        public IActionResult Index()
         {
-            List<UserModel> userList = new List<UserModel>();
-            string error = "";
-            userList = um.GetUsers(out error);
+            List<UserModel> userList = um.GetUsers(out string error);
 
             ViewBag.error = error;
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
+
+            TempData["unsuccessful"] = "Det gick inte att hämta användare. Error: " + error;
 
             return View(userList);
         }
 
          [HttpGet]
-        public IActionResult CreateUser()
+        public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult CreateUser(UserModel user)
+        public IActionResult Create(UserModel user)
         {
-            string error = "";
-
-            if (user.Password.Length < 8)
+            // Kollar ifall användarnamnet är mindre än 8
+            if (user.Password == null || user.Password.Length < 8)
             {
                 ModelState.AddModelError(nameof(user.Password), "Lösenordet måste vara mint 8 tecken långt");
+            }
+
+            if (user.Email == "" || user.Email == null)
+            {
+                ModelState.AddModelError(nameof(user.Email), "Skriv in en EmailAdress");
             }
 
             if (ModelState.IsValid)
             {
                 UserMethod um = new UserMethod();
 
-                int insertedUserId = um.InsertUser(user, out error);
+                int insertedUserId = um.InsertUser(user, out string error);
                 if (insertedUserId > 0)
                 {
                     HttpContext.Session.SetString("UserId", insertedUserId.ToString());
@@ -61,33 +65,22 @@ namespace BokToppen.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int id){
+        public IActionResult Delete(int id)
+        {
+            int rowsAffected = um.DeleteUser(id, out string error);
 
-            // Kollar om boken med idt finns
-            // int userId = us.GetUserId(ratingId, out string userError);
+            if (rowsAffected <= 0)
+            {
+                TempData["unsuccessful"] = "Det gick inte att ta bort användaren. Error: " + error;
+            }
 
-            // if (userId > 0)
-            // {
-                //Ta bort bok från listan
-                int rowsAffected = um.DeleteUser(id, out string error);
-                if (rowsAffected <= 0)
-                {
-                    TempData["unsuccessful"] = "Det gick inte att ta bort omdömet. " + error;
-                }
+            if (error != "")
+            {
+                 TempData["unsuccessful"] = "Det gick inte att ta bort användaren. Error: " + error;
+            }
 
-            // } 
-            // else 
-            // {
-            //     TempData["unsuccessful"] = " Det gick inte att ta bort användaren :(. " + userError;
-            // }
 
             return RedirectToAction("Index", "Books");
-        }
-
-       
-        public IActionResult Error()
-        {
-            return View("Error!");
         }
     }
 }

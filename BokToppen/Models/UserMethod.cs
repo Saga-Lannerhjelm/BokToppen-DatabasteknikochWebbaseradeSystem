@@ -32,17 +32,60 @@ namespace BokToppen.Models
         }
 
         // Implementerad baserat på kodexempel från https://www.thatsoftwaredude.com/content/6218/how-to-encrypt-passwords-using-sha-256-in-c-and-net
-        private byte[] CalculateSHA256(string str)
+        private byte[] CalculateSHA256(string password)
         {
             SHA256 sha256 = SHA256.Create();
             byte[] hashValue;
             UTF8Encoding objUtf8 = new UTF8Encoding();
-            hashValue = sha256.ComputeHash(objUtf8.GetBytes(str));
+            hashValue = sha256.ComputeHash(objUtf8.GetBytes(password));
 
             return hashValue;
         }
 
-        public int FindUser(UserModel user, out string errormsg)
+        public List<UserModel> GetUsers(out string errormsg)
+        {
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "SELECT * FROM Tbl_User";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            SqlDataReader reader = null;
+            var userList = new List<UserModel>();
+
+            errormsg = "";
+
+            try
+            {
+                dbConnection.Open();
+
+                reader = dbCommand.ExecuteReader();
+
+                while(reader.Read())
+                {
+                    UserModel user = new UserModel()
+                    { 
+                        Id = Convert.ToInt32(reader["Us_Id"]),
+                        Username = reader["Us_Username"].ToString(), 
+                        Email = reader["Us_Email"].ToString()
+                    };
+
+                    userList.Add(user);
+                }
+                reader.Close();
+                return userList;
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return null;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
+        
+        public int GetUser(UserModel user, out string errormsg)
         {
             byte[] hashedIncomingPassword = CalculateSHA256(user.Password);
             
@@ -96,6 +139,46 @@ namespace BokToppen.Models
                 dbConnection.Close();
             }
         }
+        
+        public string GetUserName(int? userId, out string errormsg)
+        {
+            SqlConnection dbConnection = NewConnection();
+
+            string query = "SELECT Us_Username FROM Tbl_User WHERE Us_Id = @userId";
+            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
+
+            dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = userId;
+
+            SqlDataReader reader = null;
+            string username = "";
+
+            errormsg = "";
+
+            try
+            {
+                dbConnection.Open();
+
+                reader = dbCommand.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    // Om användare inte finns så blir använtarnamnet bara ""
+                    username = reader["Us_Username"].ToString();
+                };
+
+                reader.Close();
+                return username;
+            }
+            catch (Exception e)
+            {
+                errormsg = e.Message;
+                return null;
+            }
+            finally
+            {
+                dbConnection.Close();
+            }
+        }
 
         public int InsertUser(UserModel us, out string errormsg)
         {
@@ -140,129 +223,7 @@ namespace BokToppen.Models
                 dbConnection.Close();
             }
         }
-
-        public string GetUserName(int? userId, out string errormsg)
-        {
-            SqlConnection dbConnection = NewConnection();
-
-            string query = "SELECT Us_Username FROM Tbl_User WHERE Us_Id = @userId";
-            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
-
-            dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = userId;
-
-            SqlDataReader reader = null;
-            string username = "";
-
-            errormsg = "";
-
-            try
-            {
-                dbConnection.Open();
-
-                reader = dbCommand.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    // Om användare inte finns så blir använtarnamnet bara ""
-                    username = reader["Us_Username"].ToString();
-                };
-
-                reader.Close();
-                return username;
-            }
-            catch (Exception e)
-            {
-                errormsg = e.Message;
-                return null;
-            }
-            finally
-            {
-                dbConnection.Close();
-            }
-        }
-
-        public int GetUserId(string userName, out string errormsg)
-        {
-            SqlConnection dbConnection = NewConnection();
-
-            string query = "SELECT Us_Id FROM Tbl_User WHERE Us_Username = @username";
-            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
-
-            dbCommand.Parameters.Add("username", SqlDbType.NVarChar, 50).Value = userName;
-
-            SqlDataReader reader = null;
-            int userId = 0;
-
-            errormsg = "";
-
-            try
-            {
-                dbConnection.Open();
-
-                reader = dbCommand.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    userId = Convert.ToInt32(reader["Us_Id"]);
-                };
-
-                reader.Close();
-                return userId;
-            }
-            catch (Exception e)
-            {
-                errormsg = e.Message;
-                return 0;
-            }
-            finally
-            {
-                dbConnection.Close();
-            }
-        }
-
-        public List<UserModel> GetUsers(out string errormsg)
-        {
-            SqlConnection dbConnection = NewConnection();
-
-            string query = "SELECT * FROM Tbl_User";
-            SqlCommand dbCommand = new SqlCommand(query, dbConnection);
-
-            SqlDataReader reader = null;
-            var userList = new List<UserModel>();
-
-            errormsg = "";
-
-            try
-            {
-                dbConnection.Open();
-
-                reader = dbCommand.ExecuteReader();
-
-                while(reader.Read())
-                {
-                    UserModel user = new UserModel()
-                    { 
-                        Id = Convert.ToInt32(reader["Us_Id"]),
-                        Username = reader["Us_Username"].ToString(), 
-                        Email = reader["Us_Email"].ToString()
-                    };
-
-                    userList.Add(user);
-                }
-                reader.Close();
-                return userList;
-            }
-            catch (Exception e)
-            {
-                errormsg = e.Message;
-                return null;
-            }
-            finally
-            {
-                dbConnection.Close();
-            }
-        }
-
+ 
         public int DeleteUser(int Id, out string errormsg)
         {
 

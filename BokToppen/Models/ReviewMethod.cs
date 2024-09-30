@@ -51,10 +51,10 @@ namespace BokToppen.Models
 
                     {
                         Id = Convert.ToInt32(reader["Re_Id"]),
-                        Points = Convert.ToInt32(reader["Re_Rating"]),
+                        Rating = Convert.ToInt32(reader["Re_Rating"]),
                         Comment = reader["Re_Comment"].ToString(),
                         PublishedDate = Convert.ToDateTime(reader["Re_PublishedDate"]),
-                        CreatorId = Convert.ToInt32(reader["Re_UserId"]),
+                        UserId = Convert.ToInt32(reader["Re_UserId"]),
                         CreatorName = reader["Username"].ToString(),
                         BookId = Convert.ToInt32(reader["Re_BookId"]),
                     };
@@ -122,20 +122,20 @@ namespace BokToppen.Models
             string query = "INSERT INTO Tbl_Reviews (Re_Rating, Re_Comment, Re_UserId, Re_BookId) VALUES (@rating, @comment, @userid, @bookid)";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
-            dbCommand.Parameters.Add("rating", SqlDbType.Int).Value = review.Points;
+            dbCommand.Parameters.Add("rating", SqlDbType.Int).Value = review.Rating;
             dbCommand.Parameters.Add("comment", SqlDbType.NVarChar, 100).Value = review.Comment;
-            dbCommand.Parameters.Add("userid", SqlDbType.Int).Value = review.CreatorId;
+            dbCommand.Parameters.Add("userid", SqlDbType.Int).Value = review.UserId;
             dbCommand.Parameters.Add("bookid", SqlDbType.Int).Value = review.BookId;
 
             try
             {
                 dbConnection.Open();
-                int i = 0;
+                int numberOfAffectedRows = 0;
 
                 // ExecuteNonQuery returns the number of rows affected
-                i = dbCommand.ExecuteNonQuery();
+                numberOfAffectedRows = dbCommand.ExecuteNonQuery();
 
-                if (i == 1)
+                if (numberOfAffectedRows == 1)
                 {
                     errormsg = "";
                 }
@@ -143,7 +143,7 @@ namespace BokToppen.Models
                 {
                     errormsg = "Omdömet skapades inte";
                 }
-                return (i);
+                return numberOfAffectedRows;
             }
             catch (Exception e)
             {
@@ -155,7 +155,6 @@ namespace BokToppen.Models
                 dbConnection.Close();
             }
         }
-
 
         public int DeleteReview(int Id, out string errormsg)
         {

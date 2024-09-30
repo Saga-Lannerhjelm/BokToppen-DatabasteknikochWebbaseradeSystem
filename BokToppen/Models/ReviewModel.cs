@@ -8,14 +8,9 @@ namespace BokToppen.Models
     {
         public int Id { get; set; }
 
-        public int BookId { get; set;}
-
-        public int CreatorId { get; set; }
-        public string? CreatorName { get; set; }
-
         [Required(ErrorMessage = "Du måste välja ett betyg")]
         [Range(1, 5, ErrorMessage = "Du måste välja ett betyg mellan 1 och 5")]
-        public int Points { get; set; }
+        public int Rating { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]
         [MinLength(5, ErrorMessage = "Kommentaren måste vara minst 5 tecken långt")]
@@ -23,5 +18,11 @@ namespace BokToppen.Models
         public string? Comment { get; set; }
 
         public DateTime PublishedDate { get; set; } = DateTime.Now;
+
+        public int BookId { get; set;}
+
+        public int UserId { get; set; }
+
+        public string? CreatorName { get; set; }
     }
 }

@@ -24,7 +24,6 @@ namespace BokToppen.Models
             return dbConnection;
         }
 
-
         public List<CategoryModel> GetCategories(out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();

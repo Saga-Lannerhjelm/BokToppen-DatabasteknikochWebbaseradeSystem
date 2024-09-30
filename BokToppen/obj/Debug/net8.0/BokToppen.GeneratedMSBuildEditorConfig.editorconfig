@@ -58,12 +58,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = X1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/Views/Users/CreateUser.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Q3JlYXRlVXNlci5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/Views/Users/GetUsers.cshtml]
-build_metadata.AdditionalFiles.TargetPath = R2V0VXNlcnMuY3NodG1s
+[/Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/Views/Users/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Q3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/sagalannerhjelm/Desktop/Umeå/BokToppen (v.2.)/BokToppen/Views/Users/Index.cshtml]
