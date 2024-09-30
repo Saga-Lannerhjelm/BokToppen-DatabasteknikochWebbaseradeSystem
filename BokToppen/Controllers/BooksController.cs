@@ -44,32 +44,31 @@ namespace BokToppen.Controllers
         public IActionResult Details(int id)
         {
             // Kollar om boken med idt finns
-            BookModel book = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM bookItem = bm.GetBookById(id, out string bookError);
 
             string reviewError = "";
             string userError = "";
 
-            if (book != null)
+            if (bookItem != null)
             {
-                var BookReviewsViewModel = new BookReviewsViewModel
+                var book = bm.GetBookById(id, out bookError);
+                var username =  um.GetUserName(book.Book.UserId, out userError);
+
+                var BookWithReviews = new BookReviewsVM
                 {
-                    Book = bm.GetBookById(id, out bookError),
+                    BookPost = book,
+                    Username = (username != null) ? username : "'Borttagen användare'",
                     Reviews = rm.GetReviewsByBook(id, out reviewError)
                 };
 
-                
-                string username = um.GetUserName(BookReviewsViewModel.Book.User, out userError);
-
-                // Send username to view based on user id
-                ViewBag.user = (username != null) ? username : "'Borttagen användare'";
 
                 ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
                 ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
-                return View(BookReviewsViewModel);
+                return View(BookWithReviews);
             }
             else 
             {
-                TempData["unsuccessful"] = "Bokinlägget du försökte nå finns inte. " + bookError;
+                TempData["unsuccessful"] = "Bågot gick fel med att hitta bokinlägget. " + bookError;
                 return RedirectToAction("index");
             }
                 
@@ -101,7 +100,7 @@ namespace BokToppen.Controllers
         public ActionResult Create(BookModel book, string authors){
             try
             {
-                book.User = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
+                book.UserId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
                 int antal = 0;
                 string bookError = "";
@@ -155,7 +154,7 @@ namespace BokToppen.Controllers
             }
 
             // Kollar om boken med idt finns
-            BookModel book = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM book = bm.GetBookById(id, out string bookError);
 
             if (book == null)
             {
@@ -209,7 +208,7 @@ namespace BokToppen.Controllers
         public ActionResult Delete(int id){
 
             // Kollar om boken med idt finns
-            BookModel book = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM book = bm.GetBookById(id, out string bookError);
 
             if (book != null)
             {

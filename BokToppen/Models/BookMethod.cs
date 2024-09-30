@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BokToppen.Models.ViewModels;
 using Microsoft.Data.SqlClient;
 
 namespace BokToppen.Models
@@ -73,7 +74,7 @@ namespace BokToppen.Models
                         Category = reader["Bo_CategoryId"].ToString(),
                         Description = reader["Bo_Description"].ToString(),
                         PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]),
-                        User = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null,
+                        UserId = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null,
                     };
 
                     bookList.Add(book);
@@ -97,7 +98,7 @@ namespace BokToppen.Models
             }
         }
 
-        public BookModel GetBookById(int bookId, out string errormsg)
+        public BookWithAuthorsVM GetBookById(int bookId, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
 
@@ -107,7 +108,11 @@ namespace BokToppen.Models
             dbCommand.Parameters.Add("bookid", SqlDbType.Int).Value = bookId;
 
             SqlDataReader reader = null;
-            var book = new BookModel();
+            var bookItem = new BookWithAuthorsVM
+            {
+                Book = new BookModel(),
+                Authors = new List<string>()
+            };
 
             errormsg = "";
 
@@ -119,31 +124,31 @@ namespace BokToppen.Models
 
                 while (reader.Read())
                 {
-                    if (book.Title == null)
+                    if (bookItem.Book.Title == null)
                     {
-                        book.Id = Convert.ToInt32(reader["Bo_Id"]);
-                        book.Title = reader["Bo_Title"].ToString();
-                        book.ISBN = reader["Bo_ISBN"].ToString();
-                        book.Category = reader["Bo_CategoryName"].ToString();
-                        book.CategoryId = Convert.ToInt32(reader["Bo_CategoryId"]);
-                        book.Description = reader["Bo_Description"].ToString();
-                        book.PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]);
-                        book.PublishedDate = Convert.ToDateTime(reader["Bo_CreatedAt"]);
-                        book.User = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null;
+                        bookItem.Book.Id = Convert.ToInt32(reader["Bo_Id"]);
+                        bookItem.Book.Title = reader["Bo_Title"]?.ToString();
+                        bookItem.Book.ISBN = reader["Bo_ISBN"]?.ToString();
+                        bookItem.Book.CategoryId = Convert.ToInt32(reader["Bo_CategoryId"]);
+                        bookItem.Book.Description = reader["Bo_Description"]?.ToString();
+                        bookItem.Book.PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]);
+                        bookItem.Book.PublishedDate = Convert.ToDateTime(reader["Bo_CreatedAt"]);
+                        bookItem.Book.UserId = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null;
+                        bookItem.CategoryName = reader["Bo_CategoryName"]?.ToString();
                     }
 
                     // If there exists many book, they are added to the list in this while loop,
                     // the other content is just added ones
-                    book.Authors.Add(reader["Bo_Authors"].ToString());
+                    bookItem.Authors.Add(reader["Bo_Authors"].ToString());
                 };
 
-                if (book.Title == null)
+                if (bookItem.Book.Title == null)
                 {
                     errormsg = "Gick inte att hämta bokinlägget";
                     return null;
                 }
                 reader.Close();
-                return book;
+                return bookItem;
             }
             catch (Exception e)
             {
@@ -169,7 +174,7 @@ namespace BokToppen.Models
             dbCommand.Parameters.Add("categoryId", SqlDbType.NVarChar, 20).Value = book.CategoryId;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
             dbCommand.Parameters.Add("publicationYear", SqlDbType.Int).Value = book.PublicationYear;
-            dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = book.User;
+            dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = book.UserId;
             dbCommand.Parameters.Add("authors", SqlDbType.NVarChar, 50).Value = authors;
 
             try

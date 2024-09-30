@@ -26,12 +26,12 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var book = bm.GetBookById(id, out string error);
+            var bookItem = bm.GetBookById(id, out string error);
 
-            if (book != null)
+            if (bookItem != null)
             {
-                ViewBag.BookTitle = book.Title;
-                ViewBag.BookId = book.Id;
+                ViewBag.BookTitle = bookItem.Book.Title;
+                ViewBag.BookId = bookItem.Book.Id;
 
                 ViewData["ratings"] = ratingNumbers;
                 return View();

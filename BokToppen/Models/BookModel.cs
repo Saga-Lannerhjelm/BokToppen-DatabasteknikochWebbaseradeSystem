@@ -7,7 +7,7 @@ namespace BokToppen.Models
     {
         public int Id { get; set; }
 
-        public int? User { get; set; }
+        public int? UserId { get; set; }
 
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]        
         public string? Title { get; set; }
@@ -30,6 +30,5 @@ namespace BokToppen.Models
 
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
-        public List<string>? Authors { get; set; } = new List<string>();
     }
 }

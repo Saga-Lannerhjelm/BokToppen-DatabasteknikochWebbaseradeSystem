@@ -1,4 +1,4 @@
-@model BokToppen.Models.ViewModels.BookReviewsViewModel
+@model BokToppen.Models.ViewModels.BookReviewsVM
 
 @{
      if (TempData.ContainsKey("unsuccessful")){
@@ -12,7 +12,7 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a asp-action="Index">Böcker</a></li>
-    <li class="breadcrumb-item active" aria-current="page">@Model.Book.Title</li>
+    <li class="breadcrumb-item active" aria-current="page">@Model.BookPost.Book.Title</li>
   </ol>
 </nav>
 
@@ -20,29 +20,29 @@
 <div class="card mb-3 border-dark">
   <img src="https://images.pexels.com/photos/824197/pexels-photo-824197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="card-img-top" alt="..." style="height: 30vh; object-fit: cover;">
   <div class="card-body">
-    <h5 class="card-title">@Model.Book.Title | @Model.Book.Category | @Model.Book.PublicationYear</h5>
-    <p class="card-text"><small class="text-muted">Publicerad @Model.Book.PublishedDate.ToString("dd MMMM yyyy"), skapad av @ViewBag.user</small></p>
-    <p class="card-text">ISBN: @Model.Book.ISBN</p>
-    <p class="card-text">@Model.Book.Description</p>
+    <h5 class="card-title">@Model.BookPost.Book.Title | @Model.BookPost.CategoryName | @Model.BookPost.Book.PublicationYear</h5>
+    <p class="card-text"><small class="text-muted">Publicerad @Model.BookPost.Book.PublishedDate.ToString("dd MMMM yyyy"), skapad av @Model.Username</small></p>
+    <p class="card-text">ISBN: @Model.BookPost.Book.ISBN</p>
+    <p class="card-text">@Model.BookPost.Book.Description</p>
     <p class="card-text">Bok skriven av:
         @{
-            if(Model.Book.Authors.Count() > 1)
+            if(Model.BookPost.Authors.Count() > 1)
             {
-                @foreach (var author in Model.Book.Authors)
+                @foreach (var author in Model.BookPost.Authors)
                 {
                     <span>@author,</span><span> </span>
                 }
             }
             else
             {
-                <span>@Model.Book.Authors[0]</span>
+                <span>@Model.BookPost.Authors[0]</span>
             }
         }
     </p>
     <div class="d-flex">
-        <a asp-controller="Books" asp-action="Edit" asp-route-id="@Model.Book.Id" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "") btn btn-warning">Redigera</a>
+        <a asp-controller="Books" asp-action="Edit" asp-route-id="@Model.BookPost.Book.Id" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "") btn btn-warning">Redigera</a>
         <form method="post" asp-action="Delete" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "") px-2">
-            <input asp-for="@Model.Book.Id" type="hidden" value="@Model.Book.Id" name="id">
+            <input asp-for="@Model.BookPost.Book.Id" type="hidden" value="@Model.BookPost.Book.Id" name="id">
             <button type="submit" class="btn btn-danger">Radera</button>
         </form>
     </div>
@@ -82,7 +82,7 @@
                         <p class="card-text">@review.Comment</p>
                         <form method="post" asp-controller="Reviews" asp-action="Delete" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "")">
                             <input asp-for="@review.Id" name="ratingId" value="@review.Id" type="hidden">
-                            <input asp-for="@Model.Book.Id" name="bookId" value="@Model.Book.Id" type="hidden">
+                            <input asp-for="@Model.BookPost.Book.Id" name="bookId" value="@Model.BookPost.Book.Id" type="hidden">
                             <button type="submit" value="Ta bort" class="btn btn-danger"><i class="bi bi-trash"></i></button>
                         </form>
                     </div>
@@ -101,5 +101,5 @@
             </p>
         </div>
     }
-    <a asp-controller="Reviews" asp-action="Create" asp-route-id="@Model.Book.Id" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "")">Lämna omdöme</a>
+    <a asp-controller="Reviews" asp-action="Create" asp-route-id="@Model.BookPost.Book.Id" class="@(ViewBag.UserIsLoggedIn ? "d-none" : "")">Lämna omdöme</a>
 }

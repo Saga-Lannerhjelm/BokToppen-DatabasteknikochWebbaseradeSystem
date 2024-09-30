@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace BokToppen.Models.ViewModels
 {
-    public class BookReviewsViewModel
+    public class BookReviewsVM
     {
-        public BookModel? Book { get; set;}
+        public BookWithAuthorsVM? BookPost { get; set;}
+        public string? Username {get; set;}
         public List<ReviewModel>? Reviews { get; set;}
     }
 }
