@@ -1,0 +1,20 @@
+@model BokToppen.Models.FileModel
+
+@{
+     if (TempData.ContainsKey("unsuccessful")){
+        <div class="alert alert-warning mt-2" role="alert">
+        @TempData["unsuccessful"]
+        </div>
+    }
+
+}
+
+<p>@Model.Id</p>
+<p>@Model.Name</p>
+<p>@Model.ContentType</p>
+<p>@Model.Data</p>
+<p>@ViewBag.ImageDataUrl</p>
+<img src="@ViewBag.ImageDataUrl" alt="bild" width="200px" height="200px">
+<img src="data:image/jpg;base64, @ViewBag.ImageDataUrl" alt="bild" width="126px">
+
+<p>Hello</p>

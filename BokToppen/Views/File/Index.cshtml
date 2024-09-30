@@ -1,0 +1,16 @@
+@model IEnumerable<BokToppen.Models.FileModel>
+ 
+@{
+     if (TempData.ContainsKey("unsuccessful")){
+        <div class="alert alert-warning mt-2" role="alert">
+        @TempData["unsuccessful"]
+        </div>
+    }
+
+}
+
+<form method="post" enctype="multipart/form-data" asp-controller="File" asp-action="UploadFile">
+    <input type="file" name="postedFile" />
+    <input type="submit" id="btnUpload" value="Upload" />
+       @Html.ValidationMessage("file", "", new { @class = "text-danger" })
+</form>
