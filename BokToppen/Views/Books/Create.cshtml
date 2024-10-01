@@ -21,7 +21,7 @@
       <h5 class="card-title">Lägg till en bok</h5>
       <h6 class="card-subtitle">Efter detta kan du och andra dela vad ni tycker om denna bok!</h6>
 
-      <form method="post" asp-action="Create" class="mt-2">
+      <form method="post" asp-action="Create" class="mt-2" enctype="multipart/form-data">
         <div class="mb-3">
           <label asp-for="Title"class="form-label">Titel</label>
           <input asp-for="Title" type="text" class="form-control">
@@ -56,6 +56,11 @@
           <label asp-for="Description" class="form-label">Beskrivning</label>
           <textarea asp-for="Description" class="form-control" rows="5"></textarea>
           @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+        </div>
+        <div class="mb-3">
+          <label asp-for="Image" class="form-label">Ladda upp bild</label>
+          <input asp-for="Image" type="file"/>
+          @Html.ValidationMessageFor(m => m.Image, "", new { @class = "text-danger" })
         </div>
         <button type="submit" class="btn btn-primary">Publicera</button>
       </form>

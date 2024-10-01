@@ -69,14 +69,14 @@ namespace BokToppen.Models
 
 
 
-        public FileModel GetFile(out string errormsg)
+        public FileModel GetFile(int fileId, out string errormsg)
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "SELECT * FROM Tbl_Files WHERE Fi_Id = 3";
+            string query = "SELECT * FROM Tbl_Files WHERE Fi_Id = @id";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
-            // dbCommand.Parameters.Add("id", SqlDbType.Int).Value = fileId;
+            dbCommand.Parameters.Add("id", SqlDbType.Int).Value = fileId;
 
             SqlDataReader reader = null;
             var file = new FileModel();

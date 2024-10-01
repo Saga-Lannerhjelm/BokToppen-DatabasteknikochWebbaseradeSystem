@@ -9,6 +9,8 @@ namespace BokToppen.Models.ViewModels
     {
         public BookModel? Book { get; set;}
         public string? CategoryName {get; set;}
+        public byte[]? ImageData {get; set;}
+        public string? ContentType {get; set;}
         public List<string>? Authors { get; set; } = new List<string>();
     }
 }

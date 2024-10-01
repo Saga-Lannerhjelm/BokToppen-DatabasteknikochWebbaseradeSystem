@@ -109,25 +109,38 @@ namespace BokToppen.Controllers
             {
                 book.UserId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
-                int antal = 0;
+                int affectedRows = 0;
                 string bookError = "";
 
-                if (authors == "" && authors != null) ModelState.AddModelError("authors", "Fältet kan inte vara tomt");
+                if (string.IsNullOrEmpty(authors)) ModelState.AddModelError("authors", "Fältet kan inte vara tomt");
                 if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år");
 
                 if (ModelState.IsValid)
                 {  
+                    var fileMethod = new FileMethod();
 
-                    antal = _bookMethod.InsertBook(book, authors, out bookError);
-
-                    if (bookError != "" && bookError != null)
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        TempData["unsuccessful"] = "Något blev fel. " + bookError;
-                    }
+                        book.Image.CopyTo(memoryStream);
+                        // Upload the file if less than 2 MB
+                        if (memoryStream.Length < 2097152)
+                        { 
+                            affectedRows = _bookMethod.InsertBook(book, memoryStream, authors, out bookError);
 
-                    if (antal != 0)
-                    {
-                        return RedirectToAction("Index");  
+                            if (bookError != "" && bookError != null)
+                            {
+                                TempData["unsuccessful"] = "Något blev fel. Error: " + bookError;
+                            }
+
+                            if (affectedRows != 0)
+                            {
+                                return RedirectToAction("Index");  
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(nameof(book.Image), "Filen är för stor");
+                        }
                     }
                 }
             }
@@ -136,18 +149,17 @@ namespace BokToppen.Controllers
                 //Tempdata to show unseccess
                 TempData["unsuccessful"] = "Något blev fel. " + e.Message;
             }
-
-            ViewBag.authors = authors;
             
-            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string error);
+            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string categoryError);
 
-            if (error == null)
+            if (!string.IsNullOrEmpty(categoryError))
             {
-                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + error;
+                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + categoryError;
                 return RedirectToAction("Index");
             }
             
             ViewData["category"] = categoryList;
+            ViewBag.authors = authors;
             return View("Create");
         }
 

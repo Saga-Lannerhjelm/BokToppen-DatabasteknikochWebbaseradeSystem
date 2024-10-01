@@ -26,6 +26,9 @@ namespace BokToppen.Models
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
 
+        [Required(ErrorMessage = "Du måste välja en bild att ladda upp")]
+        public IFormFile Image {get; set;}
+
         [Required(ErrorMessage = "Fältet kan inte vara tomt")]
         public int CategoryId { get; set; }
 

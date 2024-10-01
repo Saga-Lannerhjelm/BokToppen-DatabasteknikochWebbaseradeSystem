@@ -18,7 +18,7 @@
 
 @* Bok informationen *@
 <div class="card mb-3 border-dark">
-  <img src="https://images.pexels.com/photos/824197/pexels-photo-824197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="card-img-top" alt="..." style="height: 30vh; object-fit: cover;">
+  <img src="data:@(Model.BookPost.ContentType);base64,@(Convert.ToBase64String(Model.BookPost.ImageData))" class="card-img-top" alt="..." style="height: 30vh; object-fit: cover;">
   <div class="card-body">
     <h5 class="card-title">@Model.BookPost.Book.Title | @Model.BookPost.CategoryName | @Model.BookPost.Book.PublicationYear</h5>
     <p class="card-text"><small class="text-muted">Publicerad @Model.BookPost.Book.PublishedDate.ToString("dd MMMM yyyy"), skapad av @Model.Username</small></p>

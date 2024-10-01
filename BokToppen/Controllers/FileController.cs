@@ -95,21 +95,21 @@ namespace BokToppen.Controllers
         // }
 
         [HttpGet]
-        public IActionResult File()
+        public IActionResult File(int id)
         {
             // FileModel files = new FileModel();
             var fileM = new FileMethod();
 
-            FileModel file = fileM.GetFile(out string error);
+            FileModel file = fileM.GetFile(id, out string error);
 
             // Konvertera byte-arrayen till en Base64-sträng om filen finns
             if (file != null && file.Data != null)
             {
                 string base64String = Convert.ToBase64String(file.Data, 0,file.Data.Length);
-                string imageDataUrl = $"data:{file.ContentType};base64,{base64String}";
+                string imageUrl = $"data:{file.ContentType};base64,{base64String}";
 
                 // Skicka Base64-strängen till vyn
-                ViewBag.ImageDataUrl = imageDataUrl;
+                ViewBag.ImageUrl = imageUrl;
             }
 
             return View(file);

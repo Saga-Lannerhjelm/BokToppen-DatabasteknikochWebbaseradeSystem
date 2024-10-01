@@ -134,6 +134,8 @@ namespace BokToppen.Models
                         bookItem.Book.Description = reader["Bo_Description"]?.ToString();
                         bookItem.Book.PublicationYear = Convert.ToInt32(reader["Bo_PublicationYear"]);
                         bookItem.Book.PublishedDate = Convert.ToDateTime(reader["Bo_CreatedAt"]);
+                        bookItem.ImageData = (byte[])reader["Bo_ImageData"];
+                        bookItem.ContentType = reader["Bo_ImageContentType"]?.ToString();
                         bookItem.Book.UserId = reader["Bo_UserId"] != DBNull.Value ? Convert.ToInt32(reader["Bo_UserId"]) : null;
                         bookItem.CategoryName = reader["Bo_CategoryName"]?.ToString();
                     }
@@ -162,12 +164,12 @@ namespace BokToppen.Models
             }
         }
 
-        public int InsertBook(BookModel book, string authors, out string errormsg)
+        public int InsertBook(BookModel book, MemoryStream memoryStream, string authors, out string errormsg)
         {
 
             SqlConnection dbConnection = NewConnection();
 
-            string query = "EXEC addBook @title, @isbn, @categoryId, @description, @publicationYear, @userId, @authors";
+            string query = "EXEC addBook @title, @isbn, @categoryId, @description, @publicationYear, @imageData, @imageContentType, @userId, @authors";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("title", SqlDbType.NVarChar, 50).Value = book.Title;
@@ -175,6 +177,8 @@ namespace BokToppen.Models
             dbCommand.Parameters.Add("categoryId", SqlDbType.NVarChar, 20).Value = book.CategoryId;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
             dbCommand.Parameters.Add("publicationYear", SqlDbType.Int).Value = book.PublicationYear;
+            dbCommand.Parameters.Add("imageData", SqlDbType.VarBinary).Value = memoryStream.ToArray();
+            dbCommand.Parameters.Add("imageContentType", SqlDbType.NVarChar, 50).Value = book.Image.ContentType;
             dbCommand.Parameters.Add("userId", SqlDbType.Int).Value = book.UserId;
             dbCommand.Parameters.Add("authors", SqlDbType.NVarChar, 50).Value = authors;
 
