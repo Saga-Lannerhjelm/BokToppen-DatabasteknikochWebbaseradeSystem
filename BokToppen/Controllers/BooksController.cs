@@ -10,23 +10,30 @@ namespace BokToppen.Controllers
 {
     public class BooksController : Controller
     {
-        readonly BookMethod bm = new BookMethod();
-        readonly ReviewMethod rm = new ReviewMethod();
-        readonly UserMethod um = new UserMethod();
-        readonly CategoryMethod cm = new CategoryMethod();
+        private BookMethod _bookMethod;
+        private ReviewMethod _reviewMethod;
+        private UserMethod _userMethod;
+        private CategoryMethod _categoryMethod;
+
+        public BooksController()
+        {
+            _bookMethod = new BookMethod();
+            _reviewMethod = new ReviewMethod();
+            _userMethod = new UserMethod();
+            _categoryMethod = new CategoryMethod();
+        }
 
         public IActionResult Index(string q, string filter, bool sortByPublishedDate)
         {
             var books = new List<BookModel>();
-            var bm = new BookMethod();
             string error = "";
             
-            books = bm.GetBooks(q, filter, sortByPublishedDate, out error);
+            books = _bookMethod.GetBooks(q, filter, sortByPublishedDate, out error);
 
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
             ViewBag.error = error;
 
-            List<CategoryModel> categoryList = cm.GetCategories(out string categoryError);
+            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string categoryError);
 
             if (error == null)
             {
@@ -44,21 +51,21 @@ namespace BokToppen.Controllers
         public IActionResult Details(int id)
         {
             // Kollar om boken med idt finns
-            BookWithAuthorsVM bookItem = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM bookItem = _bookMethod.GetBookById(id, out string bookError);
 
             string reviewError = "";
             string userError = "";
 
             if (bookItem != null)
             {
-                var book = bm.GetBookById(id, out bookError);
-                var username =  um.GetUserName(book.Book.UserId, out userError);
+                var book = _bookMethod.GetBookById(id, out bookError);
+                var username =  _userMethod.GetUserName(book.Book.UserId, out userError);
 
                 var BookWithReviews = new BookReviewsVM
                 {
                     BookPost = book,
                     Username = (username != null) ? username : "'Borttagen användare'",
-                    Reviews = rm.GetReviewsByBook(id, out reviewError)
+                    Reviews = _reviewMethod.GetReviewsByBook(id, out reviewError)
                 };
 
 
@@ -84,7 +91,7 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string error);
 
             if (error == null)
             {
@@ -111,7 +118,7 @@ namespace BokToppen.Controllers
                 if (ModelState.IsValid)
                 {  
 
-                    antal = bm.InsertBook(book, authors, out bookError);
+                    antal = _bookMethod.InsertBook(book, authors, out bookError);
 
                     if (bookError != "" && bookError != null)
                     {
@@ -132,7 +139,7 @@ namespace BokToppen.Controllers
 
             ViewBag.authors = authors;
             
-            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string error);
 
             if (error == null)
             {
@@ -154,7 +161,7 @@ namespace BokToppen.Controllers
             }
 
             // Kollar om boken med idt finns
-            BookWithAuthorsVM book = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM book = _bookMethod.GetBookById(id, out string bookError);
 
             if (book == null)
             {
@@ -162,7 +169,7 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index");
             }
 
-            List<CategoryModel> categoryList = cm.GetCategories(out string error);
+            List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string error);
 
             if (error == null)
             {
@@ -181,7 +188,7 @@ namespace BokToppen.Controllers
 
             if (!ModelState.IsValid)
             {
-                List<CategoryModel> categoryList = cm.GetCategories(out string categoryError);
+                List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string categoryError);
 
                 if (categoryError == null)
                 {
@@ -194,7 +201,7 @@ namespace BokToppen.Controllers
             }
 
             // Hämtar datan sparad i sessionen och hitta bokinlägget med ett visst id
-            int affectedRows = bm.UpdateBook(book, out string error);
+            int affectedRows = _bookMethod.UpdateBook(book, out string error);
             
             if (affectedRows <= 0)
             {
@@ -208,12 +215,12 @@ namespace BokToppen.Controllers
         public ActionResult Delete(int id){
 
             // Kollar om boken med idt finns
-            BookWithAuthorsVM book = bm.GetBookById(id, out string bookError);
+            BookWithAuthorsVM book = _bookMethod.GetBookById(id, out string bookError);
 
             if (book != null)
             {
                 //Ta bort bok från listan
-                int rowsAffected = bm.DeleteBook(id, out string error);
+                int rowsAffected = _bookMethod.DeleteBook(id, out string error);
                 if (rowsAffected <= 0)
                 {
                     TempData["unsuccessful"] = "Det gick inte att ta bort inlägget. " + error;

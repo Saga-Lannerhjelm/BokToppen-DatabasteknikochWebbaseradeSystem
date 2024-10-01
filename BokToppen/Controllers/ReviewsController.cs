@@ -13,8 +13,14 @@ namespace BokToppen.Controllers
 {
     public class ReviewsController : Controller
     {
-        BookMethod bm = new BookMethod();
-        ReviewMethod rm = new ReviewMethod();
+        private BookMethod _bookMethod;
+        private ReviewMethod _reviewMethod;
+
+        public ReviewsController()
+        {
+            _bookMethod = new BookMethod();
+            _reviewMethod = new ReviewMethod();
+        }
         List<int> ratingNumbers = new List<int>{1, 2, 3, 4, 5};
 
         [HttpGet]
@@ -26,7 +32,7 @@ namespace BokToppen.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var bookItem = bm.GetBookById(id, out string error);
+            var bookItem = _bookMethod.GetBookById(id, out string error);
 
             if (bookItem != null)
             {
@@ -50,7 +56,7 @@ namespace BokToppen.Controllers
             if (ModelState.IsValid)
             {
 
-                int antalRowsAffected = rm.InsertReview(review, out string error);
+                int antalRowsAffected = _reviewMethod.InsertReview(review, out string error);
 
                 if (antalRowsAffected != 0)
                 {
@@ -70,12 +76,12 @@ namespace BokToppen.Controllers
         public IActionResult Delete(int ratingId, int bookId){
 
             // Kollar om boken med idt finns
-            int reviewId = rm.GetReviewId(ratingId, out string reviewError);
+            int reviewId = _reviewMethod.GetReviewId(ratingId, out string reviewError);
 
             if (reviewId > 0)
             {
                 //Ta bort bok från listan
-                int rowsAffected = rm.DeleteReview(ratingId, out string error);
+                int rowsAffected = _reviewMethod.DeleteReview(ratingId, out string error);
                 if (rowsAffected <= 0)
                 {
                     TempData["unsuccessful"] = "Det gick inte att ta bort omdömet. " + error;

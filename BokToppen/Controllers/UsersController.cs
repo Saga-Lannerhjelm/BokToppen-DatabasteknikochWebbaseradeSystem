@@ -11,11 +11,16 @@ namespace BokToppen.Controllers
 {
     public class UsersController : Controller
     {
-        UserMethod um = new UserMethod();
+        private UserMethod _userMethod;
+
+        public UsersController()
+        {
+            _userMethod = new UserMethod();
+        }
 
         public IActionResult Index()
         {
-            List<UserModel> userList = um.GetUsers(out string error);
+            List<UserModel> userList = _userMethod.GetUsers(out string error);
 
             ViewBag.error = error;
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
@@ -47,9 +52,7 @@ namespace BokToppen.Controllers
 
             if (ModelState.IsValid)
             {
-                UserMethod um = new UserMethod();
-
-                int insertedUserId = um.InsertUser(user, out string error);
+                int insertedUserId = _userMethod.InsertUser(user, out string error);
                 if (insertedUserId > 0)
                 {
                     HttpContext.Session.SetString("UserId", insertedUserId.ToString());
@@ -67,7 +70,7 @@ namespace BokToppen.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            int rowsAffected = um.DeleteUser(id, out string error);
+            int rowsAffected = _userMethod.DeleteUser(id, out string error);
 
             if (rowsAffected <= 0)
             {
