@@ -112,6 +112,7 @@ namespace BokToppen.Controllers
                 int affectedRows = 0;
                 string bookError = "";
 
+                if (book.Image == null || book.Image.Length == 0) ModelState.AddModelError(nameof(book.Image), "Du måste välja en bild");
                 if (string.IsNullOrEmpty(authors)) ModelState.AddModelError("authors", "Fältet kan inte vara tomt");
                 if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år");
 
@@ -209,16 +210,44 @@ namespace BokToppen.Controllers
                 }
                 
                 ViewData["category"] = categoryList;
-                return View(book);
-            }
 
-            // Hämtar datan sparad i sessionen och hitta bokinlägget med ett visst id
-            int affectedRows = _bookMethod.UpdateBook(book, out string error);
-            
-            if (affectedRows <= 0)
-            {
-                TempData["unsuccessful"] = "Bokinlägget kunde inte uppdateras";
+                var bookItem = new BookWithAuthorsVM()
+                {
+                    Book = book
+                };
+                return View(bookItem);
             }
+                try
+                {
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        book.Image.CopyTo(memoryStream);
+                        // Upload the file if less than 2 MB
+                        if (memoryStream.Length < 2097152)
+                        { 
+                            int affectedRows = _bookMethod.UpdateBook(book, memoryStream, out string error);
+
+                            if (error != "" && error != null)
+                            {
+                                TempData["unsuccessful"] = "Något blev fel. Error: " + error;
+                            }
+
+                            if (affectedRows <= 0)
+                            {
+                                    TempData["unsuccessful"] = "Bokinlägget kunde inte uppdateras";
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(nameof(book.Image), "Filen är för stor");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    //Tempdata to show unseccess
+                    TempData["unsuccessful"] = "Något blev fel. " + e.Message;
+                }
 
             return RedirectToAction("Details", "Books", new {id = book.Id});
         }
