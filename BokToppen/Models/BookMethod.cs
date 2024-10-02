@@ -217,12 +217,14 @@ namespace BokToppen.Models
             SqlConnection dbConnection = NewConnection();
 
             string query;
-            if (string.IsNullOrEmpty(book.Image.ContentType))
+            if (memoryStream == null)
             {
+                // Uppdatera allt förutom bild
                 query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_CategoryId = @categoryId, Bo_PublicationYear = @publicationYear, Bo_Description = @description WHERE Bo_Id = @bookId";
             }
             else
             {
+                // Uppdatera allt inklusive bild
                 query = "UPDATE Tbl_Books SET Bo_Title = @title, Bo_ISBN = @isbn, Bo_CategoryId = @categoryId, Bo_PublicationYear = @publicationYear, Bo_ImageData = @imageData, Bo_ImageContentType = @imageContentType, Bo_Description = @description WHERE Bo_Id = @bookId";
             }
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
@@ -234,7 +236,7 @@ namespace BokToppen.Models
             dbCommand.Parameters.Add("publicationYear", SqlDbType.NVarChar, 20).Value = book.PublicationYear;
             dbCommand.Parameters.Add("description", SqlDbType.NVarChar, 1000).Value = book.Description;
 
-            if (!string.IsNullOrEmpty(book.Image.ContentType))
+            if (memoryStream != null)
             {
                 dbCommand.Parameters.Add("imageData", SqlDbType.VarBinary).Value = memoryStream.ToArray();
                 dbCommand.Parameters.Add("imageContentType", SqlDbType.NVarChar, 50).Value = book.Image.ContentType;

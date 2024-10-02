@@ -31,7 +31,6 @@ namespace BokToppen.Models
 
         public int? UserId { get; set; }
 
-        [NotMapped]
         public IFormFile Image {get; set;}
     }
 }

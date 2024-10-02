@@ -50,7 +50,6 @@
         <div class="mb-3">
           <label asp-for="Book.Image" class="form-label">Ändra bild</label>
           <input asp-for="Book.Image" type="file" accept="image/*"/>
-          @Html.ValidationMessageFor(m => m.Book.Image, "", new { @class = "text-danger" })
         </div>
         <input asp-for="Book.Id" type="hidden">
         <button type="submit" class="btn btn-primary">Spara ändringar</button>

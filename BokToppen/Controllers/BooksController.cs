@@ -200,6 +200,7 @@ namespace BokToppen.Controllers
         [HttpPost]
         public ActionResult Edit(BookModel book)
         {
+            if(book.Image == null) ModelState.Remove("book.Image");
             if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år mellan år 1000 och " + DateTime.Now.Year);
 
             if (!ModelState.IsValid)
@@ -222,28 +223,37 @@ namespace BokToppen.Controllers
             }
                 try
                 {
-                    using (MemoryStream memoryStream = new MemoryStream())
+                    int affectedRows = 0;
+                    string error = "";
+                    if (book.Image == null) 
                     {
-                        book.Image.CopyTo(memoryStream);
-                        // Upload the file if less than 2 MB
-                        if (memoryStream.Length < 2097152)
-                        { 
-                            int affectedRows = _bookMethod.UpdateBook(book, memoryStream, out string error);
-
-                            if (error != "" && error != null)
-                            {
-                                TempData["unsuccessful"] = "Något blev fel. Error: " + error;
-                            }
-
-                            if (affectedRows <= 0)
-                            {
-                                    TempData["unsuccessful"] = "Bokinlägget kunde inte uppdateras";
-                            }
-                        }
-                        else
+                        affectedRows = _bookMethod.UpdateBook(book, null, out error);
+                    }
+                    else
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
                         {
-                            ModelState.AddModelError(nameof(book.Image), "Filen är för stor");
+                            book.Image.CopyTo(memoryStream);
+                            // Upload the file if less than 2 MB
+                            if (memoryStream.Length < 2097152)
+                            { 
+                                affectedRows = _bookMethod.UpdateBook(book, memoryStream, out error);
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(nameof(book.Image), "Filen är för stor");
+                            }
                         }
+                    }
+                    
+                    if (error != "" && error != null)
+                    {
+                        TempData["unsuccessful"] = "Något blev fel. Error: " + error;
+                    }
+
+                    if (affectedRows <= 0)
+                    {
+                            TempData["unsuccessful"] = "Bokinlägget kunde inte uppdateras";
                     }
                 }
                 catch (Exception e)
