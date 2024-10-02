@@ -1,3 +1,5 @@
+#nullable disable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +33,8 @@ namespace BokToppen.Models
             return dbConnection;
         }
 
-        // Implementerad baserat på kodexempel från https://www.thatsoftwaredude.com/content/6218/how-to-encrypt-passwords-using-sha-256-in-c-and-net
+        // Implementerad baserat på kodexempel 
+        // från https://www.thatsoftwaredude.com/content/6218/how-to-encrypt-passwords-using-sha-256-in-c-and-net
         private byte[] CalculateSHA256(string password)
         {
             SHA256 sha256 = SHA256.Create();
@@ -199,9 +202,6 @@ namespace BokToppen.Models
                 dbConnection.Open();
 
                 int userId = Convert.ToInt32(dbCommand.ExecuteScalar());
-
-                // ExecuteNonQuery returns the number of rows affected
-                // int count = dbCommand.ExecuteNonQuery();
 
                 if (userId > 0)
                 {

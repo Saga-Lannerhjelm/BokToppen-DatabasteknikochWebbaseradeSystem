@@ -15,8 +15,14 @@ namespace BokToppen.Models
         public BookMethod() {
             _connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
         }
-        
-        UserMethod um = new UserMethod();
+
+        // private IConfiguration Configuration;
+        // // private readonly string _connectionString;
+
+        // public BookMethod (IConfiguration _configuration)
+        // {
+        //     Configuration = _configuration;
+        // }
        
         private SqlConnection NewConnection()
         {
@@ -34,7 +40,7 @@ namespace BokToppen.Models
 
             string query = "SELECT * FROM Tbl_Books";
 
-             if (searchParam != null || (filter != null && filter != "0")) query += " WHERE";
+            if (searchParam != null || (filter != null && filter != "0")) query += " WHERE";
 
             if (searchParam != null) query += " Bo_Title LIKE @searchParams";
             if (filter != null && filter != "0")
@@ -80,11 +86,6 @@ namespace BokToppen.Models
 
                     bookList.Add(book);
                 }
-                if (bookList.Count() == 0)
-                {
-                     errormsg = "Hittade inga bokinlägg";
-                    return bookList;
-                }
                 reader.Close();
                 return bookList;
             }
@@ -103,7 +104,7 @@ namespace BokToppen.Models
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "SELECT Tbl_Books.*, Au_Name AS Bo_Authors, Ca_Category AS Bo_CategoryName FROM Tbl_Books INNER JOIN Tbl_Books_Authors ON Bo_Id = Tbl_Books_Authors.BA_BookID INNER JOIN Tbl_Authors ON Tbl_Books_Authors.BA_AuthorID = Au_Id INNER JOIN Tbl_Categories ON Tbl_Categories.Ca_Id = Bo_CategoryId WHERE Bo_Id = @bookid;";
+            string query = "SELECT * FROM vw_BookDetails WHERE Bo_Id = @bookid;";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("bookid", SqlDbType.Int).Value = bookId;

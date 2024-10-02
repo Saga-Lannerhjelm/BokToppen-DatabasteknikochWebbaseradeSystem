@@ -14,8 +14,6 @@
     }
 }
 
-<p>@ViewBag.error</p>
-
 <form method="get" asp-controller="Books" asp-action="Index" class="mb-3">
      <div class="mb-3">
          <label @*asp-for="Category"*@ class="form-label">Sök</label>
@@ -46,11 +44,12 @@
     <a type="button" class="mb-2" asp-action="Create"><i class="bi bi-plus-square text-primary h2"></i></a>
 </div>
 
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<p>@ViewBag.information</p>
+<div class="row row-cols-1 row-cols-md-4 g-4">  
     @foreach (BookModel book in Model)
     {
         <div class="col">
-            <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" class="card hover hover-shadow">
+            <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" class="card hover hover-shadow" style="text-decoration: none;">
                 @* <img src="https://images.pexels.com/photos/904616/pexels-photo-904616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="card-img-bottom" alt="..." style="height: 40px; object-fit: cover;"> *@
                 <div class="card-body">
                     <h5 class="card-title" style="text-decoration: none; color: black; border: none;">@book.Title</h5>

@@ -1,13 +1,21 @@
 @model BokToppen.Models.UserModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Logga in";
 }
 
 @{
     if (TempData.ContainsKey("notLoggedIn")){
         <div class="alert alert-warning mt-2" role="alert">
         @TempData["notLoggedIn"]
+        </div>
+    }
+}
+
+@{
+     if (TempData.ContainsKey("unsuccessful")){
+        <div class="alert alert-warning mt-2" role="alert">
+        @TempData["unsuccessful"]
         </div>
     }
 }

@@ -26,24 +26,27 @@ namespace BokToppen.Controllers
         public IActionResult Index(string q, string filter, bool sortByPublishedDate)
         {
             var books = new List<BookModel>();
-            string error = "";
             
-            books = _bookMethod.GetBooks(q, filter, sortByPublishedDate, out error);
+            books = _bookMethod.GetBooks(q, filter, sortByPublishedDate, out string bookError);
 
-            ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
-            ViewBag.error = error;
+            if (books.Count == 0)
+            {
+                ViewBag.information = "Din sökning och/eller filtrering gav inga träffar. Testa att söka på något annat.";
+            }
 
+            // Hämtar kategorier för att visa dem i en dropdown i index-vyn
             List<CategoryModel> categoryList = _categoryMethod.GetCategories(out string categoryError);
 
-            if (error == null)
+            if (!string.IsNullOrEmpty(categoryError) || !string.IsNullOrEmpty(bookError))
             {
-                TempData["unsuccessful"] = "Gick inte att hitta kategorier. " + categoryError;
+                TempData["unsuccessful"] = "Gick inte att hämda data. Error: " + categoryError + " " + bookError;
             }
-            
+
             ViewData["category"] = categoryList;
             ViewBag.query = q;
             ViewBag.filter = filter;
             ViewBag.sort = sortByPublishedDate;
+            ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
 
             return View(books);
         }
@@ -58,18 +61,20 @@ namespace BokToppen.Controllers
 
             if (bookItem != null)
             {
-                var book = _bookMethod.GetBookById(id, out bookError);
-                var username =  _userMethod.GetUserName(book.Book.UserId, out userError);
+                var username =  _userMethod.GetUserName(bookItem.Book.UserId, out userError);
 
                 var BookWithReviews = new BookReviewsVM
                 {
-                    BookPost = book,
+                    BookPost = bookItem,
                     Username = (username != null) ? username : "'Borttagen användare'",
                     Reviews = _reviewMethod.GetReviewsByBook(id, out reviewError)
                 };
 
+                 if (!string.IsNullOrEmpty(userError) || !string.IsNullOrEmpty(reviewError))
+                {
+                    TempData["unsuccessful"] = "Gick inte att hämda data. Error: " + userError + " " + reviewError;
+                }
 
-                ViewBag.error = "Book: " + bookError + ", Review: " + reviewError + ", User: " + userError;
                 ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
                 return View(BookWithReviews);
             }
@@ -107,23 +112,21 @@ namespace BokToppen.Controllers
         public ActionResult Create(BookModel book, string authors){
             try
             {
-                book.UserId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
-
-                int affectedRows = 0;
-                string bookError = "";
-
                 if (book.Image == null || book.Image.Length == 0) ModelState.AddModelError(nameof(book.Image), "Du måste välja en bild");
                 if (string.IsNullOrEmpty(authors)) ModelState.AddModelError("authors", "Fältet kan inte vara tomt");
                 if (book.PublicationYear < 1000 || book.PublicationYear > DateTime.Now.Year)  ModelState.AddModelError(nameof(book.PublicationYear), "Fältet måste vara ett år");
+                
+                int affectedRows = 0;
+                string bookError = "";
 
                 if (ModelState.IsValid)
                 {  
-                    var fileMethod = new FileMethod();
+                    book.UserId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
                     using (MemoryStream memoryStream = new MemoryStream())
                     {
                         book.Image.CopyTo(memoryStream);
-                        // Upload the file if less than 2 MB
+                        
                         if (memoryStream.Length < 2097152)
                         { 
                             affectedRows = _bookMethod.InsertBook(book, memoryStream, authors, out bookError);

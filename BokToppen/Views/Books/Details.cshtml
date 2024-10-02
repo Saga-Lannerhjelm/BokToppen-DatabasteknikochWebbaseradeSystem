@@ -1,12 +1,7 @@
 @model BokToppen.Models.ViewModels.BookReviewsVM
 
 @{
-     if (TempData.ContainsKey("unsuccessful")){
-        <div class="alert alert-warning mt-2" role="alert">
-        @TempData["unsuccessful"]
-        </div>
-    }
-
+    ViewData["Title"] = Model.BookPost.Book.Title;
 }
 
 <nav aria-label="breadcrumb">
@@ -16,9 +11,17 @@
   </ol>
 </nav>
 
+@{
+     if (TempData.ContainsKey("unsuccessful")){
+        <div class="alert alert-warning mt-2" role="alert">
+        @TempData["unsuccessful"]
+        </div>
+    }
+}
+
 @* Bok informationen *@
-<div class="card mb-3 border-dark">
-  <img src="data:@(Model.BookPost.ContentType);base64,@(Convert.ToBase64String(Model.BookPost.ImageData))" class="card-img-top" alt="..." style="height: 30vh; object-fit: cover;">
+<div class="card mb-3 border-dark flex-row">
+  <img src="data:@(Model.BookPost.ContentType);base64,@(Convert.ToBase64String(Model.BookPost.ImageData))" class="card-img-left .img-fluid" alt="..." style="height: auto; width: 18vw; object-fit: cover;">
   <div class="card-body">
     <h5 class="card-title">@Model.BookPost.Book.Title | @Model.BookPost.CategoryName | @Model.BookPost.Book.PublicationYear</h5>
     <p class="card-text"><small class="text-muted">Publicerad @Model.BookPost.Book.PublishedDate.ToString("dd MMMM yyyy"), skapad av @Model.Username</small></p>
@@ -54,7 +57,7 @@
     if (Model.Reviews != null && Model.Reviews.Any())
     {
         @* Om det finns omdömen *@
-        <h4>Omdömmen av denna bok:</h4>
+        <h4>Omdömen av denna bok:</h4>
             @foreach (var review in Model.Reviews)
             {
                  <div class="card border-dark mb-3">

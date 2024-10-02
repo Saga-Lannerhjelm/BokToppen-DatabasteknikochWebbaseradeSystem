@@ -29,7 +29,7 @@ namespace BokToppen.Models
         {
             SqlConnection dbConnection = NewConnection();
 
-            string query = "SELECT Tbl_Reviews.*, Tbl_User.Us_Username AS Username FROM Tbl_Reviews INNER JOIN Tbl_User On Tbl_User.Us_Id = Tbl_Reviews.Re_UserId WHERE Re_BookId = @bookId";
+            string query = "SELECT * FROM vw_ReviewsForBook WHERE Re_BookId = @bookId";
             SqlCommand dbCommand = new SqlCommand(query, dbConnection);
 
             dbCommand.Parameters.Add("bookid", SqlDbType.Int).Value = bookId;

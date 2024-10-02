@@ -22,11 +22,12 @@ namespace BokToppen.Controllers
         {
             List<UserModel> userList = _userMethod.GetUsers(out string error);
 
-            ViewBag.error = error;
             ViewBag.UserIsLoggedIn = HttpContext.Session.GetString("UserId") == null;
 
-            TempData["unsuccessful"] = "Det gick inte att hämta användare. Error: " + error;
-
+            if (!string.IsNullOrEmpty(error))
+            {
+                TempData["unsuccessful"] = "Det gick inte att hämta användare. Error: " + error;
+            }
             return View(userList);
         }
 
@@ -83,7 +84,7 @@ namespace BokToppen.Controllers
             }
 
 
-            return RedirectToAction("Index", "Books");
+            return RedirectToAction("Index");
         }
     }
 }

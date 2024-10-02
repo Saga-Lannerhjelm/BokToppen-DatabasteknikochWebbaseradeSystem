@@ -1,5 +1,9 @@
 @model BokToppen.Models.ViewModels.BookWithAuthorsVM
 
+@{
+    ViewData["Title"] = "Ändra inlägg";
+}
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Book.Id">@Model.Book.Title</a></li>
@@ -45,7 +49,7 @@
         </div>
         <div class="mb-3">
           <label asp-for="Book.Image" class="form-label">Ändra bild</label>
-          <input asp-for="Book.Image" type="file"/>
+          <input asp-for="Book.Image" type="file" accept="image/*"/>
           @Html.ValidationMessageFor(m => m.Book.Image, "", new { @class = "text-danger" })
         </div>
         <input asp-for="Book.Id" type="hidden">
