@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -31,6 +32,6 @@ namespace BokToppen.Models
 
         public int? UserId { get; set; }
 
-        public IFormFile Image {get; set;}
+        public IFormFile? Image {get; set;}
     }
 }

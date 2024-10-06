@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,16 +15,7 @@ namespace BokToppen.Models
         
         public BookMethod() {
             _connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
-        }
-
-        // private IConfiguration Configuration;
-        // // private readonly string _connectionString;
-
-        // public BookMethod (IConfiguration _configuration)
-        // {
-        //     Configuration = _configuration;
-        // }
-       
+        }       
         private SqlConnection NewConnection()
         {
             //Skapa SQL-connection
@@ -50,7 +42,6 @@ namespace BokToppen.Models
             } 
             if (sortByPublishedDate)
             {
-                string andOperator = (searchParam != null || (filter != null && filter != "0")) ? " AND" : "";
                 query += " ORDER BY Bo_PublicationYear";
             }
 

@@ -1,3 +1,4 @@
+#nullable disable
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BokToppen.Models;
@@ -53,7 +54,6 @@ namespace BokToppen.Controllers
 
         public IActionResult Details(int id)
         {
-            // Kollar om boken med idt finns
             BookWithAuthorsVM bookItem = _bookMethod.GetBookById(id, out string bookError);
 
             string reviewError = "";

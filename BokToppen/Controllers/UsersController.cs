@@ -31,7 +31,7 @@ namespace BokToppen.Controllers
             return View(userList);
         }
 
-         [HttpGet]
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
