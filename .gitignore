@@ -6,3 +6,6 @@ BokToppen/obj/Debug/net8.0/BokToppen.dll
 BokToppen/obj/Debug/net8.0/BokToppen.AssemblyInfo.cs
 BokToppen/bin/Debug/net8.0/BokToppen.pdb
 BokToppen/bin/Debug/net8.0/BokToppen.dll
+*.dll
+*.cache
+*.dll
